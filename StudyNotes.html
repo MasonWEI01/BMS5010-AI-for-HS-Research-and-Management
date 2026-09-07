@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>監督式學習教材 · 把公式當儀表板（Applied ML）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"/>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
+<style>
+:root{
+  --bg:#f6f3ec; --paper:#fffdf8; --ink:#1c1917; --muted:#57534e;
+  --line:#e4ddd0; --accent:#0f4c5c; --accent-2:#9a3412; --teal:#0f766e;
+  --ok:#166534; --warn:#a16207; --bad:#9f1239; --chip:#eef4f4;
+  --code:#1c1917; --code-fg:#e7e5e4; --sidebar:280px; --shadow:0 8px 30px rgba(28,25,23,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.75 "Noto Sans TC",system-ui,sans-serif}
+a{color:var(--accent)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.wrap{display:grid;grid-template-columns:var(--sidebar) 1fr;min-height:100vh}
+nav.toc{
+  position:sticky;top:0;height:100vh;overflow:auto;padding:22px 16px 40px;
+  background:#efeae1;border-right:1px solid var(--line);
+}
+nav.toc .brand{font-family:"Noto Serif TC",serif;font-weight:700;font-size:18px;line-height:1.35;color:var(--accent);margin:0 0 4px}
+nav.toc .sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+nav.toc input{
+  width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;margin-bottom:14px;font:13px "Noto Sans TC"
+}
+nav.toc a{display:block;text-decoration:none;color:#3f3a34;font-size:13px;padding:4px 8px;border-radius:6px;line-height:1.45}
+nav.toc a:hover,nav.toc a.active{background:#fff;color:var(--accent)}
+nav.toc .g{margin:12px 0 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#7c746a;padding:0 8px}
+nav.toc .l2{padding-left:16px;font-size:12.5px}
+.main{max-width:860px;margin:0 auto;padding:36px 28px 80px}
+.hero{
+  background:linear-gradient(180deg,#fff 0%,#f4faf9 100%);
+  border:1px solid var(--line);border-radius:18px;padding:28px 28px 22px;box-shadow:var(--shadow);margin-bottom:28px
+}
+.hero h1{font-family:"Noto Serif TC",serif;font-size:32px;line-height:1.25;margin:0 0 8px}
+.kicker{color:var(--accent);font-weight:600;font-size:13px;letter-spacing:.06em}
+.hero p{color:var(--muted);margin:8px 0 0}
+.path{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.path span{background:var(--chip);border:1px solid #d7e5e3;color:var(--accent);padding:4px 10px;border-radius:999px;font-size:12.5px}
+h2{font-family:"Noto Serif TC",serif;font-size:28px;margin:48px 0 12px;padding-top:12px;border-top:1px solid var(--line)}
+h3{font-size:20px;margin:28px 0 8px;color:#1f3d44}
+h4{margin:18px 0 6px;font-size:16px}
+p{margin:10px 0}
+ul,ol{padding-left:1.3em}
+li{margin:4px 0}
+.box{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--paper);border-radius:0 10px 10px 0;padding:12px 14px;margin:14px 0}
+.box.def{border-left-color:var(--accent)}
+.box.ex{border-left-color:var(--teal);background:#f3fbf8}
+.box.warn{border-left-color:var(--warn);background:#fffbeb}
+.box.mis{border-left-color:var(--bad);background:#fff7f8}
+.box.py{border-left-color:#334155;background:#f7f7f5}
+.box .lbl{font-size:12px;font-weight:700;letter-spacing:.04em;margin-bottom:4px;color:var(--accent)}
+.box.ex .lbl{color:var(--teal)}
+.box.warn .lbl{color:#92400e}
+.box.mis .lbl{color:var(--bad)}
+.box.py .lbl{color:#334155}
+pre{
+  background:var(--code);color:var(--code-fg);padding:14px 16px;border-radius:12px;overflow:auto;
+  font:13px/1.55 "IBM Plex Mono",monospace;margin:12px 0
+}
+pre .k{color:#93c5fd} pre .s{color:#fcd34d} pre .c{color:#a8a29e} pre .n{color:#86efac} pre .f{color:#c4b5fd} pre .ann{color:#fda4af}
+.note{font-size:14px;color:var(--muted)}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px;background:#fff}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:#f3eee4}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+.demo{background:#fff;border:1px solid #d7e5e3;border-radius:16px;padding:16px;margin:16px 0;box-shadow:var(--shadow)}
+.demo h4{margin-top:0;color:var(--accent)}
+.demo .ctrls{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;margin:8px 0 12px;font-size:14px}
+.demo input[type=range]{width:180px}
+.demo button,.copy{
+  background:var(--accent);color:#fff;border:0;border-radius:8px;padding:7px 12px;cursor:pointer;font:13px "Noto Sans TC"
+}
+.demo button.sec{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+canvas{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:10px;display:block}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.stat{background:var(--chip);border-radius:8px;padding:6px 10px;font-size:13px}
+.quiz{background:#fff;border:1px dashed #c9bfae;border-radius:12px;padding:14px;margin:16px 0}
+.quiz button{margin:4px 6px 0 0}
+.ok{color:var(--ok);font-weight:600}
+.bad{color:var(--bad);font-weight:600}
+.idx-item{padding:10px 0;border-bottom:1px solid var(--line)}
+.idx-item b{color:var(--accent)}
+.foot{margin-top:48px;color:var(--muted);font-size:13px}
+.topbar{display:none}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;margin-right:4px;letter-spacing:.02em}
+.tag.pred{background:#dbeafe;color:#1e40af}
+.tag.err{background:#fee2e2;color:#9f1239}
+.tag.par{background:#fef3c7;color:#92400e}
+.tag.prob{background:#d1fae5;color:#065f46}
+.tag.data{background:#e2e8f0;color:#334155}
+.tag.hyp{background:#ede9fe;color:#5b21b6}
+.tag.dec{background:#ffedd5;color:#9a3412}
+.dash{border:1px solid #d7e5e3;border-radius:14px;overflow:hidden;margin:16px 0;background:#fff;box-shadow:var(--shadow)}
+.dash .eqbox{padding:12px 16px 6px;background:#f7fbfb;border-bottom:1px solid #e4eee9}
+.dash .eqbox .ttl{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.dash table.meta{margin:0;font-size:14px}
+.dash table.meta th{width:7.2em;background:#eef4f4;color:#0f4c5c;font-weight:600;white-space:nowrap}
+.howto{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
+.howto h4{margin:0 0 8px;color:var(--accent)}
+.syn{font-size:14px;margin-top:0}
+.syn th:nth-child(1){width:34%}
+.syn td:nth-child(1){font-family:"IBM Plex Mono",monospace;font-size:12.5px;white-space:nowrap}
+.tag.py{background:#e0e7ff;color:#3730a3}
+.lab{border:1px solid #86efac;background:#f0fdf4;border-radius:16px;padding:16px 18px;margin:22px 0}
+.lab > .lbl{color:#166534;font-weight:700;font-size:12px;letter-spacing:.05em;margin-bottom:6px}
+.lab h4{margin:0 0 10px;color:#14532d;font-size:18px}
+.lab .ask{background:#fff;border:1px dashed #86efac;border-radius:10px;padding:10px 12px;margin:10px 0}
+.lang-switch{
+  position:fixed;top:12px;right:14px;z-index:60;
+  display:flex;align-items:center;gap:2px;
+  background:#fff;border:1px solid var(--line);border-radius:999px;
+  padding:3px;box-shadow:var(--shadow);font-size:13px;
+}
+.lang-switch button{
+  background:transparent;border:0;cursor:pointer;color:var(--muted);
+  padding:5px 12px;border-radius:999px;font:13px "Noto Sans TC",sans-serif;
+}
+.lang-switch button.on{background:var(--accent);color:#fff}
+@media(max-width:980px){
+  .lang-switch{top:52px;right:10px}
+
+  .wrap{grid-template-columns:1fr}
+  nav.toc{position:fixed;z-index:20;transform:translateX(-110%);transition:.2s;width:min(86vw,300px)}
+  nav.toc.open{transform:none}
+  .topbar{display:flex;position:sticky;top:0;z-index:15;background:#efeae1;border-bottom:1px solid var(--line);padding:10px 14px;align-items:center;gap:10px}
+  .grid2,.grid4{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="lang-switch" id="langSwitch" title="切換繁體／简体">
+  <button type="button" id="btnHant" data-lang="zh-Hant">繁體</button>
+  <button type="button" id="btnHans" data-lang="zh-Hans">简体</button>
+</div>
+<div class="topbar"><button id="menuBtn" class="copy">目錄</button><strong>監督式學習教材</strong></div>
+<div class="wrap">
+<nav class="toc" id="toc">
+  <div class="brand">監督式學習教材</div>
+  <div class="sub">Applied ML · Python 零基礎可讀<br/>公式當儀表 · 語法逐行講</div>
+  <input id="tocFilter" placeholder="搜尋章節或詞彙…"/>
+  <div class="g">導覽</div>
+  <a href="#intro">這門課要你會什麼</a>
+  <a href="#how-read">公式怎麼讀</a>
+  <div class="g">第 0 章 Python 零基礎</div>
+  <a href="#py0">0 本課會用到的 Python</a>
+  <a class="l2" href="#py-start">0.1 你的起點與怎麼跑</a>
+  <a class="l2" href="#py-sent">0.2 一句程式長什麼樣</a>
+  <a class="l2" href="#py-dot">0.3 點號、函數、物件</a>
+  <a class="l2" href="#py-list">0.4 清單、編號、切片</a>
+  <a class="l2" href="#py-import">0.5 import 借工具箱</a>
+  <a class="l2" href="#py-np">0.6 NumPy ≈ 線性代數</a>
+  <a class="l2" href="#py-pd">0.7 pandas ≈ Excel 表</a>
+  <a class="l2" href="#py-sk">0.8 sklearn 固定三步</a>
+  <a class="l2" href="#py-cheat">0.9 語法速查</a>
+  <a class="l2" href="#lab0">應用例題 0 · 先算再印</a>
+  <div class="g">第 1 章 監督式學習</div>
+  <a href="#ch1">1 線性迴歸工作流</a>
+  <a class="l2" href="#ch1-three">1.1 三件事：資料／學／預測</a>
+  <a class="l2" href="#ch1-dataset">1.2 糖尿病資料</a>
+  <a class="l2" href="#lab1">應用例題 1 · 打開表格</a>
+  <a class="l2" href="#ch1-line">1.3 這條線在預測什麼</a>
+  <a class="l2" href="#ch1-fit">1.4 參數是哪一行算出來的</a>
+  <a class="l2" href="#ch1-pred">1.5 對新病人做預測</a>
+  <a class="l2" href="#ch1-err">1.6 誤差儀表：MSE</a>
+  <a class="l2" href="#ch1-demo">1.7 互動：拉線看誤差</a>
+  <a class="l2" href="#lab2">應用例題 2 · 讀書時數預測分數</a>
+  <div class="g">第 2 章 多項式</div>
+  <a href="#ch2">2 選彎的模型</a>
+  <a class="l2" href="#ch2-phi">2.1 特徵映射在算什麼</a>
+  <a class="l2" href="#ch2-choose">2.2 怎麼選次數 \(p\)</a>
+  <a class="l2" href="#ch2-demo">2.3 互動：次數 vs 測試誤差</a>
+  <a class="l2" href="#lab3">應用例題 3 · 選多項式次數</a>
+  <div class="g">第 3 章 分類</div>
+  <a href="#ch3">3 邏輯迴歸</a>
+  <a class="l2" href="#ch3-def">3.1 分類要預測什麼</a>
+  <a class="l2" href="#ch3-sig">3.2 分數 → 機率</a>
+  <a class="l2" href="#ch3-loss">3.3 分類的誤差儀表</a>
+  <a class="l2" href="#ch3-soft">3.4 Softmax 多類</a>
+  <a class="l2" href="#ch3-demo">3.5 互動：決策邊界</a>
+  <a class="l2" href="#lab4">應用例題 4 · 鳶尾花分類</a>
+  <div class="g">第 4 章 評估與正則化</div>
+  <a href="#ch4">4 測試誤差才算數</a>
+  <a class="l2" href="#ch4-fail">4.1 過擬合／欠擬合</a>
+  <a class="l2" href="#ch4-split">4.2 訓練／驗證／測試</a>
+  <a class="l2" href="#ch4-ridge">4.3 Ridge：把權重壓小</a>
+  <a class="l2" href="#ch4-lasso">4.4 Lasso：丟掉特徵</a>
+  <a class="l2" href="#ch4-demo">4.5 互動：選 \(\lambda\)</a>
+  <a class="l2" href="#lab5">應用例題 5 · Ridge 與 Lasso</a>
+  <div class="g">總表</div>
+  <a href="#cheatsheet">公式儀表速查</a>
+  <a href="#index">詞彙 INDEX（含 Python）</a>
+  <a href="#practice">應用練習</a>
+</nav>
+<main class="main" id="main">
+
+<section class="hero" id="intro">
+  <div class="kicker">APPLIED MACHINE LEARNING · WEEK 1–2</div>
+  <h1>監督式學習：會用這些數學工具</h1>
+  <p>給<strong>沒寫過 Python、沒上過機器學習</strong>、但學過微積分、一點機率統計與線性代數的人。公式當儀表讀；每一段程式都會拆成「這行語法在幹嘛」。對應講義：Supervised Learning、Polynomial Regression、Classification、Regularization。</p>
+  <div class="path">
+    <span>選模型</span><span>看誤差</span><span>解釋這條線在預測什麼</span>
+    <span>測試誤差才算數</span><span>Python 對應行</span>
+  </div>
+</section>
+
+<div class="howto" id="how-read">
+  <h4>公式在本頁一律當儀表板讀（四欄）</h4>
+  <ol>
+    <li><b>這在算什麼</b>：預測值、誤差、參數、機率、還是超參數。</li>
+    <li><b>儀表讀法</b>：這個數字變大／變小代表現場發生什麼。</li>
+    <li><b>程式哪一行</b>：sklearn 裡對應的呼叫。你要會指著螢幕說「這行在算 θ」「這行在算測試誤差」。</li>
+    <li><b>你要會的應用</b>：選模型、看誤差、解釋預測、只用測試（或驗證）誤差做決定。</li>
+  </ol>
+  <p class="note" style="margin:8px 0 0">標籤顏色：<span class="tag pred">預測值</span><span class="tag err">誤差</span><span class="tag par">參數</span><span class="tag prob">機率</span><span class="tag data">資料</span><span class="tag hyp">超參數</span><span class="tag dec">決策</span></p>
+</div>
+
+<div class="grid4">
+  <div class="card"><b>1. 選模型</b><br/>直線、多項式次數、Logistic、Ridge / Lasso。用<strong>驗證集誤差</strong>選，不要用訓練誤差。</div>
+  <div class="card"><b>2. 看誤差</b><br/>MSE、交叉熵、準確率都是儀表。訓練誤差只告訴你「有沒有擬合成功」。</div>
+  <div class="card"><b>3. 解釋這條線</b><br/>能說：「BMI=27 時，模型預測風險約 215。」分類則說：「屬於 Setosa 的機率 0.92。」</div>
+  <div class="card"><b>4. 測試誤差才算數</b><br/>最終報告、比較演算法、決定能不能上線，只看沒碰過的測試集。</div>
+</div>
+
+<!-- ===================== PY0 ===================== -->
+<h2 id="py0">第 0 章　Python 零基礎（只教本課會碰到的）</h2>
+<p>Python 是一種程式語言：你寫「指令」，電腦照做。本課用它來<strong>載入表格、算矩陣、畫散佈圖、呼叫現成的迴歸</strong>。你不需要先成為工程師；把下面當成「計算機的文法」即可。</p>
+<p>你已有的數學會直接派上用場：</p>
+<table>
+  <tr><th>你學過的</th><th>在這門課裡對到哪裡</th></tr>
+  <tr><td>微積分：對函數求最小</td><td><code>fit</code> 就是在最小化訓練誤差 \(J(\theta)\)</td></tr>
+  <tr><td>機率：平均、條件機率 \(P(y\mid x)\)</td><td>MSE 是平均平方差；邏輯迴歸輸出的是條件機率</td></tr>
+  <tr><td>線性代數：向量、矩陣相乘、轉置</td><td>\(X\theta\)、<code>X.T @ X</code>、特徵矩陣的列與欄</td></tr>
+</table>
+
+<h3 id="py-start">0.1 怎麼跑、怎麼裝套件</h3>
+<p><b>建議環境：</b> Jupyter Notebook 或 Google Colab（瀏覽器裡一格一格執行，最友善）。VS Code 也可以。</p>
+<ul>
+  <li>在格子裡貼上程式，按 Shift+Enter 執行。</li>
+  <li>井字號 <code>#</code> 後面是<strong>註解</strong>：給人看的說明，電腦不執行。</li>
+  <li>第一次要裝本課套件（在終端機或 notebook 格子執行一次即可）：</li>
+</ul>
+<pre>pip install numpy pandas scikit-learn matplotlib</pre>
+<table class="syn">
+  <tr><th>寫了什麼</th><th>語法／作用</th></tr>
+  <tr><td><code>pip</code></td><td>Python 的「套件安裝員」。</td></tr>
+  <tr><td><code>install</code></td><td>動詞：請幫我裝。</td></tr>
+  <tr><td><code>numpy pandas ...</code></td><td>要裝的四個工具箱名稱，空格隔開。</td></tr>
+</table>
+<p>四個工具箱各做一件事：<b>NumPy</b> 算向量矩陣；<b>pandas</b> 當 Excel；<b>scikit-learn</b>（import 時寫 <code>sklearn</code>）做機器學習；<b>matplotlib</b> 畫圖。</p>
+
+<h3 id="py-sent">0.2 一句程式長什麼樣</h3>
+<div class="box py">
+  <div class="lbl">最小例子：存一個數字、印出來</div>
+<pre>bmi = <span class="n">27.3</span>                 <span class="c"># 把 27.3 存進名叫 bmi 的盒子</span>
+risk = <span class="n">37.38</span> * bmi - <span class="n">797</span>   <span class="c"># * 乘、 - 減；這就是 f(x)=37.38x-797</span>
+<span class="k">print</span>(risk)                 <span class="c"># 把盒子裡的值顯示出來</span></pre>
+</div>
+<table class="syn">
+  <tr><th>語法</th><th>意思（請對照數學）</th></tr>
+  <tr><td><code>bmi = 27.3</code></td><td><b>指定</b>：左邊是變數名（你取的標籤），右邊是值。之後寫 <code>bmi</code> 就代表 27.3。不是「等於」那種判斷，判斷相等要寫 <code>==</code>。</td></tr>
+  <tr><td><code>37.38 * bmi</code></td><td>乘號必須寫 <code>*</code>，不能省略。次方寫 <code>**</code>，例如 <code>x**2</code> 是 \(x^2\)。</td></tr>
+  <tr><td><code>print(risk)</code></td><td><b>函數呼叫</b>：名字 <code>print</code>，圓括號裡放要處理的東西（引數）。</td></tr>
+  <tr><td><code># ...</code></td><td>註解。從 <code>#</code> 到該行結尾電腦都忽略。</td></tr>
+  <tr><td>縮排（空白）</td><td>Python 用行首空白表示「屬於上面那一塊」。本課多數程式一行一句，先記住：<b>不要亂刪行首空白</b>。</td></tr>
+</table>
+<p>常見資料型別：</p>
+<table>
+  <tr><th>型別</th><th>例子</th><th>備註</th></tr>
+  <tr><td>整數 int</td><td><code>20</code>、<code>-3</code></td><td></td></tr>
+  <tr><td>浮點數 float</td><td><code>37.38</code>、<code>1e5</code></td><td><code>1e5</code> 是科學記號 \(1\times 10^5=100000\)</td></tr>
+  <tr><td>布林 bool</td><td><code>True</code>、<code>False</code></td><td>第一個字母必須大寫。當「是／否」。</td></tr>
+  <tr><td>字串 str</td><td><code>'bmi'</code>、<code>"BMI"</code></td><td>用引號包起來的文字。欄位名稱都是字串。</td></tr>
+  <tr><td>無</td><td><code>None</code></td><td>「空的」。本課少用。</td></tr>
+</table>
+
+<h3 id="py-dot">0.3 點號、函數、物件（本課最重要的文法）</h3>
+<p>把 <code>obj</code> 想成「一台已經造好的機器」。<code>.</code>（點）的意思是「去用這台機器上的某個功能或某個讀數」。</p>
+<div class="box py">
+  <div class="lbl">本課會反覆出現的形狀</div>
+<pre>obj = LinearRegression()     <span class="c"># 造一台「線性迴歸機器」（還是空的）</span>
+obj.fit(X, y)                <span class="c"># 請它學習：把 X, y 餵進去，算出參數</span>
+y_hat = obj.predict(X_new)   <span class="c"># 請它預測</span>
+<span class="k">print</span>(obj.coef_)             <span class="c"># 讀出它記住的斜率（屬性，沒有括號）</span></pre>
+</div>
+<table class="syn">
+  <tr><th>寫法</th><th>這是什麼</th></tr>
+  <tr><td><code>LinearRegression()</code></td><td><b>造物件</b>。類別名稱 + 空括號 = 做出一個實例。括號裡可放設定，如 <code>Ridge(alpha=0.1)</code>。</td></tr>
+  <tr><td><code>obj.fit(X, y)</code></td><td><b>方法</b>（method）：機器會做的動作。有括號，因為在「做事」。位置引數：第一個是 \(X\)，第二個是 \(y\)。</td></tr>
+  <tr><td><code>obj.predict(X_new)</code></td><td>另一個方法。回傳預測值，用 <code>=</code> 存起來。</td></tr>
+  <tr><td><code>obj.coef_</code></td><td><b>屬性</b>（attribute）：機器上記住的數字。沒有括號。sklearn 規定：<code>fit</code> 之後才有的屬性，名字以底線 <code>_</code> 結尾。</td></tr>
+  <tr><td><code>return_X_y=True</code></td><td><b>關鍵字引數</b>：用名字指定，不必記順序。讀成「把名叫 return_X_y 的開關設成 True」。</td></tr>
+</table>
+<p>對照：<code>fit</code> 像「解 \(\min J(\theta)\)」；<code>predict</code> 像「代入 \(f(x)=\theta^\top x\)」；<code>coef_</code> 就是 \(\theta\)。</p>
+
+<h3 id="py-list">0.4 清單、編號從 0 開始、切片</h3>
+<p>清單（list）是用方括號排成一列的東西，很像有限數列。</p>
+<pre>xs = [<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>]     <span class="c"># 三個數字</span>
+xs[<span class="n">0</span>]                <span class="c"># → 1  第一個。編號從 0 起，不是從 1</span>
+xs[<span class="n">-1</span>]               <span class="c"># → 3  負號：從尾巴數</span>
+xs[-<span class="n">20</span>:]             <span class="c"># 從倒數第 20 個一直到結尾（少於 20 個就全拿）</span></pre>
+<table class="syn">
+  <tr><th>語法</th><th>作用</th></tr>
+  <tr><td><code>[a, b, c]</code></td><td>做出清單。</td></tr>
+  <tr><td><code>xs[i]</code></td><td>取第 \(i\) 格（0 是第一格）。對應向量的第 \(i\) 個分量，但電腦從 0 數。</td></tr>
+  <tr><td><code>xs[start:stop]</code></td><td><b>切片</b>：半開區間 \([start, stop)\)。省略 start 或 stop 代表從頭／到尾。</td></tr>
+  <tr><td><code>xs[-20:]</code></td><td>最後 20 筆。講義用來當訓練集。</td></tr>
+  <tr><td><code>X[:, :2]</code></td><td>二維切片：逗號前是列、後是欄。<code>:</code> 表示「全部列」，<code>:2</code> 表示「前兩欄」（編號 0 與 1）。</td></tr>
+  <tr><td><code>( 'poly', 某物件 )</code></td><td><b>tuple 元組</b>：小括號、不可隨意改。Pipeline 用它來「給這一步取名字」。</td></tr>
+</table>
+<div class="box warn">
+  <div class="lbl">小白最容易錯</div>
+  數學寫 \(x_1\) 當第一個分量；Python 清單第一個是 <code>x[0]</code>。看到 <code>coef_[0]</code> 請讀成「斜率那一格」，不是「第 0 個特徵」的數學下標 0。
+</div>
+
+<h3 id="py-import">0.5 import：向工具箱借東西</h3>
+<pre><span class="k">import</span> numpy <span class="k">as</span> np                          <span class="c"># 借整個 numpy，以後用短名 np</span>
+<span class="k">from</span> sklearn <span class="k">import</span> datasets                <span class="c"># 只借 sklearn 裡的 datasets</span>
+<span class="k">from</span> sklearn.linear_model <span class="k">import</span> LinearRegression  <span class="c"># 只借這一個類別</span></pre>
+<table class="syn">
+  <tr><th>寫法</th><th>之後怎麼用</th></tr>
+  <tr><td><code>import 套件 as 暱稱</code></td><td><code>np.ones(3)</code>、<code>np.array(...)</code></td></tr>
+  <tr><td><code>from 套件 import 名字</code></td><td>直接寫 <code>datasets.load_diabetes(...)</code> 或 <code>LinearRegression()</code></td></tr>
+  <tr><td>中間的點 <code>sklearn.linear_model</code></td><td>資料夾層層進去：sklearn → linear_model 這一層。</td></tr>
+</table>
+<p>沒有 <code>import</code> 就呼叫，電腦會說 <code>NameError</code>：它不認識這個名字。每個 notebook 開頭都要 import 一次。</p>
+
+<h3 id="py-np">0.6 NumPy：把線性代數打進電腦</h3>
+<p>NumPy 的 <code>ndarray</code> 就是向量／矩陣。本課只用這幾招：</p>
+<pre><span class="k">import</span> numpy <span class="k">as</span> np
+X = np.c_[np.ones(<span class="n">3</span>), [<span class="n">1</span>,<span class="n">2</span>,<span class="n">3</span>]]   <span class="c"># 3×2 矩陣：左邊全 1（截距），右邊 x</span>
+y = np.array([<span class="n">2.</span>, <span class="n">3.</span>, <span class="n">5.</span>])
+theta = np.linalg.solve(X.T @ X, X.T @ y)  <span class="c"># 解 (XᵀX) θ = Xᵀy</span>
+y_hat = X @ theta                          <span class="c"># 矩陣乘向量 = 預測值</span></pre>
+<table class="syn">
+  <tr><th>寫法</th><th>數學</th></tr>
+  <tr><td><code>np.array([2., 3., 5.])</code></td><td>向量 \(y\in\mathbb{R}^3\)。點 <code>2.</code> 強調是小數。</td></tr>
+  <tr><td><code>np.ones(3)</code></td><td>全 1 向量 \((1,1,1)^\top\)，給截距欄用。</td></tr>
+  <tr><td><code>np.c_[A, B]</code></td><td>把兩欄左右併成矩陣（c = column）。</td></tr>
+  <tr><td><code>X.T</code></td><td>轉置 \(X^\top\)。</td></tr>
+  <tr><td><code>@</code></td><td>矩陣乘法。對應你寫的 \(X\theta\)、\(X^\top X\)。不要用 <code>*</code>（那是逐元素相乘）。</td></tr>
+  <tr><td><code>np.linalg.solve(A, b)</code></td><td>解 \(A\theta=b\)。比先求反矩陣 <code>inv</code> 再乘更穩。</td></tr>
+</table>
+
+<h3 id="py-pd">0.7 pandas：把資料當成 Excel</h3>
+<p><code>DataFrame</code> = 有欄名的表。每一<b>列</b>是一個病人，每一<b>欄</b>是一個變數。</p>
+<pre>diabetes_X.loc[:, [<span class="s">'bmi'</span>]]   <span class="c"># 用欄名取 BMI 這一欄</span>
+diabetes_X.iloc[-<span class="n">20</span>:]        <span class="c"># 用位置取最後 20 列</span>
+y_train.values               <span class="c"># 把表變成純數字陣列，給 sklearn</span></pre>
+<table class="syn">
+  <tr><th>寫法</th><th>作用</th></tr>
+  <tr><td><code>.loc[列, 欄]</code></td><td>用「名稱」選。逗號前是列、後是欄。<code>:</code> 表示全部列。</td></tr>
+  <tr><td><code>['bmi']</code></td><td>清單裡一個字串，表示只要這一欄（結果仍是表，不是單一行）。</td></tr>
+  <tr><td><code>.iloc[位置]</code></td><td>用「第幾列第幾欄」選，從 0 起算。</td></tr>
+  <tr><td><code>* 30 + 25</code></td><td>對整欄做同一算術。講義用來把標準化過的 BMI 拉回大約真實量級。</td></tr>
+  <tr><td><code>&amp;</code></td><td>邏輯且（兩邊都要 True）。做 <code>old_man</code> 特徵時用。一般英文 and 在陣列上要用 <code>&amp;</code>。</td></tr>
+</table>
+
+<h3 id="py-sk">0.8 sklearn：永遠是「造 → fit → predict」</h3>
+<p>scikit-learn 把演算法都做成同一種機器。你記住這三步就能讀懂後面所有程式：</p>
+<ol>
+  <li><b>造</b>：<code>obj = LinearRegression()</code> 或 <code>Ridge(alpha=0.1)</code> 或 <code>LogisticRegression(C=1e5)</code>。括號裡是超參數（你選的，不是資料算出來的）。</li>
+  <li><b>學參數</b>：<code>obj.fit(X_train, y_train)</code>。只在訓練集上做。</li>
+  <li><b>預測</b>：<code>obj.predict(X_new)</code>。測試集上<b>不要再 fit</b>。</li>
+</ol>
+<p>讀結果：</p>
+<table>
+  <tr><th>屬性／方法</th><th>儀表</th></tr>
+  <tr><td><code>coef_</code>、<code>intercept_</code></td><td>參數 \(\theta\)</td></tr>
+  <tr><td><code>predict(X)</code></td><td>預測值（迴歸=分數；分類=類別編號）</td></tr>
+  <tr><td><code>predict_proba(X)</code></td><td>機率（分類）</td></tr>
+  <tr><td><code>score(X, y)</code></td><td>在這批資料上的表現（迴歸預設 \(R^2\)，分類預設準確率）</td></tr>
+</table>
+<div class="box py">
+  <div class="lbl">畫圖兩行（matplotlib）</div>
+<pre><span class="k">import</span> matplotlib.pyplot <span class="k">as</span> plt
+plt.scatter(X_train, y_train, color=<span class="s">'black'</span>)  <span class="c"># 散佈點</span>
+plt.xlabel(<span class="s">'BMI'</span>)                             <span class="c"># 橫軸文字</span>
+plt.ylabel(<span class="s">'Diabetes Risk'</span>)</pre>
+</div>
+<table class="syn">
+  <tr><th>語法</th><th>作用</th></tr>
+  <tr><td><code>plt.scatter(x, y, color='black')</code></td><td>每個 \((x_i,y_i)\) 畫一個點。字串 <code>'black'</code> 是顏色名。</td></tr>
+  <tr><td><code>plt.xlabel('BMI')</code></td><td>幫座標軸寫標題。引號內可改成中文。</td></tr>
+</table>
+
+<h3 id="py-cheat">0.9 本課語法速查（看不懂哪一行就回這裡）</h3>
+<table>
+  <tr><th>看到</th><th>讀成</th></tr>
+  <tr><td><code>=</code></td><td>存進左邊這個名字</td></tr>
+  <tr><td><code>==</code>、<code>&gt;</code>、<code>&lt;</code></td><td>判斷真假，得到 True/False</td></tr>
+  <tr><td><code>.</code></td><td>用這個物件上的方法或屬性</td></tr>
+  <tr><td><code>()</code></td><td>呼叫／造物件。裡面可放引數</td></tr>
+  <tr><td><code>[]</code></td><td>清單，或「取出第幾格／切片」</td></tr>
+  <tr><td><code>['bmi']</code></td><td>叫 bmi 的那一欄</td></tr>
+  <tr><td><code>#</code></td><td>註解</td></tr>
+  <tr><td><code>from A import B</code></td><td>從工具箱 A 拿出 B</td></tr>
+  <tr><td><code>True</code> / <code>False</code></td><td>是／否（要大寫）</td></tr>
+  <tr><td><code>1e5</code></td><td>100000</td></tr>
+  <tr><td><code>@</code></td><td>矩陣乘法</td></tr>
+  <tr><td><code>.T</code></td><td>轉置</td></tr>
+  <tr><td>名字以 <code>_</code> 結尾</td><td>sklearn 在 fit 之後才填的結果</td></tr>
+</table>
+<div class="quiz">
+  <b>Python 小測驗</b>
+  <p>Q1. <code>obj.fit(X, y)</code> 的點號是什麼意思？
+    <button onclick="grade(this,true,'pq1')">用 obj 這台機器上名叫 fit 的功能</button>
+    <button onclick="grade(this,false,'pq1')">小數點</button>
+  </p><div id="pq1"></div>
+  <p>Q2. 清單第一個元素的編號是？
+    <button onclick="grade(this,true,'pq2')">0</button>
+    <button onclick="grade(this,false,'pq2')">1</button>
+  </p><div id="pq2"></div>
+  <p>Q3. 要讀斜率，寫 <code>obj.coef_</code> 還是 <code>obj.coef_()</code>？
+    <button onclick="grade(this,true,'pq3')">obj.coef_（屬性，沒有括號）</button>
+    <button onclick="grade(this,false,'pq3')">obj.coef_()（當成函數呼叫）</button>
+  </p><div id="pq3"></div>
+</div>
+
+<div class="lab" id="lab0">
+  <div class="lbl">應用例題 0 · 親手跑 Python（還沒用 sklearn）</div>
+  <h4>題目</h4>
+  <div class="ask">
+    三位同學讀書時數是 1、2、4 小時。你先<strong>不要擬合</strong>，而是用手寫的直線
+    \(f(x)=10x+50\) 當「猜的模型」（預測考試分數）。請用 Python：把時數放進清單、用迴圈算出每位的預測分數並印出來，最後再印出三人預測的平均。
+  </div>
+  <p><b>這題在練什麼：</b>變數、<code>=</code>、清單、算術、<code>for</code>、<code>print</code>。對應儀表：這裡算出來的是<b>預測值</b>，不是參數（參數 10 與 50 是你自己寫死的）。</p>
+  <p><b>解題步驟：</b>① 存資料 ② 對每個 \(x\) 代入 \(10x+50\) ③ 印出來 ④ 求平均。</p>
+<pre>hours = [<span class="n">1</span>, <span class="n">2</span>, <span class="n">4</span>]              <span class="c"># 資料：三個 x，清單從 0 編號</span>
+preds = []                       <span class="c"># 空清單，等一下把預測值一個個放進去</span>
+<span class="k">for</span> x <span class="k">in</span> hours:                  <span class="c"># 依序把 1、2、4 放進變數 x</span>
+    y_hat = <span class="n">10</span> * x + <span class="n">50</span>          <span class="c"># 預測值：就是 f(x)=10x+50</span>
+    preds.append(y_hat)          <span class="c"># 方法 append：把 y_hat 接到清單尾巴</span>
+    <span class="k">print</span>(<span class="s">'讀書'</span>, x, <span class="s">'小時 → 預測'</span>, y_hat, <span class="s">'分'</span>)
+avg = sum(preds) / len(preds)    <span class="c"># sum 加總、len 個數。這是平均，還不是 MSE</span>
+<span class="k">print</span>(<span class="s">'平均預測'</span>, avg)</pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>在算什麼</th></tr>
+  <tr><td><code>hours = [1, 2, 4]</code></td><td>造清單，存進名字 <code>hours</code>。</td><td>資料 \(x\)</td></tr>
+  <tr><td><code>preds = []</code></td><td>空清單，稍後往裡加東西。</td><td>用來收集預測值</td></tr>
+  <tr><td><code>for x in hours:</code></td><td>迴圈。冒號不能省；下面縮排的行會重複三次。</td><td>對每個樣本做同一件事</td></tr>
+  <tr><td><code>y_hat = 10 * x + 50</code></td><td><code>*</code> 是乘。這不是 <code>fit</code>，是你手寫的公式。</td><td><b>預測值</b></td></tr>
+  <tr><td><code>preds.append(y_hat)</code></td><td>點號+括號 = 方法。把一個數字接到尾巴。</td><td>累積預測</td></tr>
+  <tr><td><code>print('讀書', x, ...)</code></td><td>字串與數字用逗號隔開一起印。</td><td>給人看</td></tr>
+  <tr><td><code>sum(preds) / len(preds)</code></td><td>內建函數 <code>sum</code>、<code>len</code>。除號是 <code>/</code>。</td><td>平均預測（還不是誤差）</td></tr>
+</table>
+<p><b>你應該看到：</b> 1 小時→60 分，2 小時→70 分，4 小時→90 分，平均約 73.3。請口述：「這條線在預測考試分數；斜率 10 表示每多讀 1 小時，預測多 10 分。」下一步（例題 2）才會讓電腦自己找出斜率和截距。</p>
+<p><b>自己改一改：</b> 把斜率改成 8、截距改成 55，再跑一次，看數字怎麼變。這就是在「轉參數旋鈕」。</p>
+</div>
+
+<!-- ===================== CH1 ===================== -->
+<h2 id="ch1">第 1 章　線性迴歸工作流</h2>
+<p>來源：<em>Lecture 2: Supervised Learning</em>。貫穿例子：用 BMI 預測糖尿病風險分數。整章只做四件事——放資料、選一條直線、讀出預測、看誤差。</p>
+
+<h3 id="ch1-three">1.1 現場只發生三件事</h3>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag dec">決策</span> 監督式學習的流程（不是定理，是工作順序）</div>
+    \[
+      \text{Dataset} + \text{Learning Algorithm} \;\to\; \text{Predictive Model}
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td>左邊是輸入（資料 + 你選的演算法），右邊是輸出（一條可以拿來預測的線／函數）。</td></tr>
+    <tr><th>儀表讀法</th><td>資料本身不會給答案；必須先選模型、再擬合，才有「對新 \(x\) 的預測」。</td></tr>
+    <tr><th>程式哪一行</th><td><code>obj.fit(X_train, y_train)</code> 完成「學習」；之後的 <code>obj.predict(X_new)</code> 才是「預測模型」。</td></tr>
+    <tr><th>你要會的應用</th><td>報告時分開講：我用什麼資料、選什麼模型、擬合後預測什麼。</td></tr>
+  </table>
+</div>
+<ul>
+  <li><b>Dataset</b>：成對的 \((x,y)\)。此例 \(x=\) BMI，\(y=\) 風險分數。</li>
+  <li><b>Learning algorithm</b>：模型類別（直線）+ 誤差儀表（MSE）+ 優化器（<code>fit</code>）。</li>
+  <li><b>Predictive model</b>：擬合後的 \(f(x)\)。你真正拿去用的是這個。</li>
+</ul>
+
+<h3 id="ch1-dataset">1.2 糖尿病資料：儀表上的 \(X\) 和 \(y\)</h3>
+<p>sklearn 的 UCI Diabetes：442 人、10 個特徵、目標是一年後疾病進展分數。講義把 BMI 還原成約真實量級（<code>bmi * 30 + 25</code>），取最後 20 筆當訓練。</p>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag data">資料</span> 訓練集（你餵給 <code>fit</code> 的東西）</div>
+    \[
+      \mathcal{D}=\{(x^{(i)}, y^{(i)})\}_{i=1}^{n}
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td>不在「算」。這是資料本身：第 \(i\) 個病人的輸入 \(x^{(i)}\) 與已知答案 \(y^{(i)}\)。</td></tr>
+    <tr><th>儀表讀法</th><td>上標 \((i)\) = 第幾個樣本。下標 \(j\) = 第幾個特徵。不要把上標當次方。</td></tr>
+    <tr><th>程式哪一行</th><td><code>X_train = diabetes_X.iloc[-20:]</code>、<code>y_train = diabetes_y.iloc[-20:]</code>。<code>X.shape</code> 在 sklearn 是 <code>(n, d)</code>：列=樣本、欄=特徵。</td></tr>
+    <tr><th>你要會的應用</th><td>能指出：哪裡是特徵、哪裡是標籤；sklearn 的 <code>X</code> 和講義 \(d\times n\) 矩陣差一個轉置。</td></tr>
+  </table>
+</div>
+<div class="box py">
+  <div class="lbl">Python · 每一行在做什麼</div>
+<pre><span class="k">from</span> sklearn <span class="k">import</span> datasets
+diabetes_X, diabetes_y = datasets.load_diabetes(return_X_y=<span class="k">True</span>, as_frame=<span class="k">True</span>)  <span class="c"># 資料：X 特徵、y 目標</span>
+diabetes_X = diabetes_X.loc[:, [<span class="s">'bmi'</span>]] * <span class="n">30</span> + <span class="n">25</span>                                <span class="c"># 資料：只留 BMI 並還原量級</span>
+X_train = diabetes_X.iloc[-<span class="n">20</span>:]                                                 <span class="c"># 資料：訓練輸入</span>
+y_train = diabetes_y.iloc[-<span class="n">20</span>:]                                                 <span class="c"># 資料：訓練答案</span></pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>對應數學／工作</th></tr>
+  <tr><td><code>from sklearn import datasets</code></td><td>從 sklearn 工具箱拿出 <code>datasets</code> 這個子模組。</td><td>還沒算東西，只是開門。</td></tr>
+  <tr><td><code>diabetes_X, diabetes_y = ...</code></td><td>一次解包兩個回傳值：左邊兩個名字分別接特徵表與目標。</td><td>資料 \(\mathcal{D}\) 拆成 \(X\) 與 \(y\)。</td></tr>
+  <tr><td><code>load_diabetes(return_X_y=True, as_frame=True)</code></td><td>呼叫函數。兩個關鍵字引數都是 True：只要 X/y、用 DataFrame 格式。</td><td>載入 442 列的表。</td></tr>
+  <tr><td><code>.loc[:, ['bmi']]</code></td><td>全部列、只要名叫 bmi 的欄。外層清單讓結果仍是「一欄的表」。</td><td>只留特徵 \(x=\) BMI。</td></tr>
+  <tr><td><code>* 30 + 25</code></td><td>對整欄每個數字做同一線性變換。</td><td>還原量級，方便畫圖。</td></tr>
+  <tr><td><code>.iloc[-20:]</code></td><td>位置切片：最後 20 列。</td><td>訓練集 \(n=20\)。</td></tr>
+</table>
+</div>
+<p>sklearn 已把特徵去均值、縮放，所以 <code>age</code> 可能是負的——那是標準化後的值，不是年齡為負。</p>
+<table>
+  <tr><th>欄位</th><th>當特徵還是目標</th></tr>
+  <tr><td>age, sex, bmi, bp, s1–s6</td><td>特徵 \(x\)（輸入）</td></tr>
+  <tr><td>target</td><td>目標 \(y\)（要預測的連續分數）→ 這是 <b>迴歸</b></td></tr>
+</table>
+<p>若 \(y\) 是類別（有病／沒病），同一套流程變成第 3 章的分類。可自己做新特徵：</p>
+<pre>diabetes_X[<span class="s">'old_man'</span>] = (diabetes_X[<span class="s">'sex'</span>] &gt; <span class="n">0</span>) &amp; (diabetes_X[<span class="s">'age'</span>] &gt; <span class="n">0.05</span>)</pre>
+<table class="syn">
+  <tr><th>片段</th><th>語法</th></tr>
+  <tr><td><code>diabetes_X['old_man'] = ...</code></td><td>用字串當欄名，<strong>造出新的一欄</strong>並寫進去。</td></tr>
+  <tr><td><code>&gt; 0</code></td><td>比較，得到 True/False（布林）。</td></tr>
+  <tr><td><code>&amp;</code></td><td>逐格「且」。兩邊通常要加括號，否則優先順序會錯。</td></tr>
+</table>
+<p>這仍是資料，不是參數。</p>
+
+<div class="lab" id="lab1">
+  <div class="lbl">應用例題 1 · 打開真實表格</div>
+  <h4>題目</h4>
+  <div class="ask">
+    請載入 sklearn 的糖尿病資料，完成四件事：(1) 印出資料有幾列幾欄；(2) 只留下 <code>bmi</code> 欄；(3) 取最後 20 筆當訓練集；(4) 印出這 20 筆的前 5 列，確認你拿到的是數字而不是文字。
+  </div>
+  <p><b>這題在練什麼：</b><code>import</code>、函數的關鍵字引數、<code>loc</code> / <code>iloc</code>、<code>shape</code>、<code>head</code>。對應儀表：整段都在準備<b>資料</b>，還沒算參數。</p>
+<pre><span class="k">from</span> sklearn <span class="k">import</span> datasets
+diabetes_X, diabetes_y = datasets.load_diabetes(return_X_y=<span class="k">True</span>, as_frame=<span class="k">True</span>)
+<span class="k">print</span>(<span class="s">'X 的形狀'</span>, diabetes_X.shape)          <span class="c"># (列數, 欄數) = (樣本數 n, 特徵數 d)</span>
+<span class="k">print</span>(<span class="s">'欄名'</span>, list(diabetes_X.columns))      <span class="c"># columns 是欄名；list(...) 轉成普通清單方便印</span>
+bmi = diabetes_X.loc[:, [<span class="s">'bmi'</span>]]             <span class="c"># 只要 bmi 這一欄，結果仍是表</span>
+X_train = bmi.iloc[-<span class="n">20</span>:]                     <span class="c"># 最後 20 列</span>
+y_train = diabetes_y.iloc[-<span class="n">20</span>:]
+<span class="k">print</span>(X_train.head())                        <span class="c"># head()：看前 5 列</span>
+<span class="k">print</span>(y_train.head())</pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>在算什麼</th></tr>
+  <tr><td><code>from sklearn import datasets</code></td><td>借出資料集模組。</td><td>開門，不算</td></tr>
+  <tr><td><code>load_diabetes(return_X_y=True, as_frame=True)</code></td><td>兩個開關都打開：回傳 X 與 y；用 DataFrame。</td><td>資料</td></tr>
+  <tr><td><code>diabetes_X, diabetes_y = ...</code></td><td>解包：左邊兩個名字接兩個回傳值。</td><td>\(X\) 與 \(y\)</td></tr>
+  <tr><td><code>.shape</code></td><td>屬性（沒括號）。印出來像 <code>(442, 10)</code>。</td><td>讀 \(n,d\)</td></tr>
+  <tr><td><code>list(diabetes_X.columns)</code></td><td><code>columns</code> 是欄名；<code>list</code> 轉清單。</td><td>看有哪些特徵</td></tr>
+  <tr><td><code>.loc[:, ['bmi']]</code></td><td>所有列、名叫 bmi 的欄。</td><td>選特徵</td></tr>
+  <tr><td><code>.iloc[-20:]</code></td><td>位置切片，最後 20 筆。</td><td>訓練集</td></tr>
+  <tr><td><code>.head()</code></td><td>方法（有括號）：預設看前 5 列。</td><td>檢查資料長對沒有</td></tr>
+</table>
+<p><b>怎麼判斷自己做對：</b> <code>shape</code> 應接近 <code>(442, 10)</code>；<code>X_train.shape</code> 應是 <code>(20, 1)</code>。若報 <code>NameError</code>，多半是忘記 import。若 <code>bmi</code> 有負值，那是標準化後的值，不是錯誤。</p>
+<p><b>自己改一改：</b> 改成取前 20 筆 <code>iloc[:20]</code>，再改成只取 <code>bp</code> 欄。每次改完都 <code>print(shape)</code>。</p>
+</div>
+
+<h3 id="ch1-line">1.3 這條線在預測什麼</h3>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag pred">預測值</span> 線性模型（模型類別）</div>
+    \[
+      f(x)=\theta_1 x + \theta_0
+      \qquad\text{多特徵：}\quad
+      f(x)=\theta_0+\theta_1 x_1+\cdots+\theta_d x_d=\theta^\top x
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td><b>預測值</b>。輸入 BMI（或一排特徵），輸出模型認為的風險分數。</td></tr>
+    <tr><th>儀表讀法</th><td>\(\theta_1\) 是斜率：BMI 每加 1，預測風險加多少。\(\theta_0\) 是截距：線與縱軸交點；BMI 不會是 0，截距通常不當「真實風險」來解釋。</td></tr>
+    <tr><th>程式哪一行</th><td>擬合後：<code>obj.coef_[0]</code> 是 \(\theta_1\)，<code>obj.intercept_</code> 是 \(\theta_0\)。預測：<code>obj.predict(X)</code> 就是 \(f(x)\)。</td></tr>
+    <tr><th>你要會的應用</th><td>口述：「這條線在預測：給定 BMI，糖尿病風險分數。」講義得到 \(\theta_1\approx 37.38\)，意思是 BMI 高 1，預測風險約高 37 分（相關，不是因果）。</td></tr>
+  </table>
+</div>
+<p>不同的 \((\theta_0,\theta_1)\) 是不同直線。學習 = 在所有直線裡挑一條。這叫選參數，還不是選模型家族（直線 vs 多項式才是選模型）。</p>
+
+<h3 id="ch1-fit">1.4 參數是哪一行算出來的</h3>
+<p><code>fit</code> 內部在做：找讓訓練誤差最小的 \(\theta\)。線性迴歸的閉式解叫普通最小平方 OLS；你不必手算，但要知道儀表上這個 \(\theta^\star\) 是<strong>參數</strong>，不是預測值。</p>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag par">參數</span> <code>fit</code> 求出的 \(\theta^\star\)（OLS）</div>
+    \[
+      \theta^\star=(X^\top X)^{-1}X^\top y
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td><b>參數</b>。斜率和截距。不是某個病人的預測分數。</td></tr>
+    <tr><th>儀表讀法</th><td>這條公式的輸出會寫進 <code>coef_</code> / <code>intercept_</code>。之後所有預測都用這組固定參數。</td></tr>
+    <tr><th>程式哪一行</th><td><code>obj.fit(X_train, y_train)</code> ← 整行都在算 \(\theta^\star\)。等價手寫：<code>np.linalg.solve(X.T@X, X.T@y)</code>（\(X\) 需自行加上全 1 欄當截距）。</td></tr>
+    <tr><th>你要會的應用</th><td>會解釋係數；不必在考試外手算反矩陣。特徵很多或損失不是平方時，<code>fit</code> 改走迭代（梯度下降），你仍然只呼叫 <code>fit</code>。</td></tr>
+  </table>
+</div>
+<div class="box py">
+  <div class="lbl">Python · 擬合 = 算參數；predict = 算預測值</div>
+<pre><span class="k">from</span> sklearn <span class="k">import</span> linear_model
+obj = linear_model.LinearRegression()
+obj.fit(X_train, y_train.values)          <span class="c"># 參數：算出 θ1, θ0</span>
+<span class="k">print</span>(obj.coef_[<span class="n">0</span>], obj.intercept_)      <span class="c"># 參數：讀出來 ≈ 37.38, -797.08</span>
+y_hat_train = obj.predict(X_train)        <span class="c"># 預測值：訓練點上的 f(x)</span></pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>在算什麼</th></tr>
+  <tr><td><code>from sklearn import linear_model</code></td><td>借出線性模型這一層。</td><td>—</td></tr>
+  <tr><td><code>obj = linear_model.LinearRegression()</code></td><td>空括號 = 用預設設定造一台機器，存進 <code>obj</code>。</td><td>還沒算。模型類別：直線。</td></tr>
+  <tr><td><code>obj.fit(X_train, y_train.values)</code></td><td>方法呼叫。第一引數特徵、第二引數答案。<code>.values</code> 把 pandas 轉成 NumPy 陣列。</td><td><b>參數</b> \(\theta^\star\)</td></tr>
+  <tr><td><code>print(obj.coef_[0], obj.intercept_)</code></td><td><code>print</code> 可一次印多個，逗號隔開。<code>coef_</code> 是陣列，<code>[0]</code> 取第一格（斜率）。</td><td>讀參數</td></tr>
+  <tr><td><code>y_hat_train = obj.predict(X_train)</code></td><td>把訓練 \(X\) 丟進去，回傳一排預測值。</td><td><b>預測值</b> \(f(x)\)</td></tr>
+</table>
+</div>
+<div class="box ex">
+  <div class="lbl">例題 · 三個點，看清「參數 vs 預測值」</div>
+  <p>資料 \((1,2),(2,3),(3,5)\)。OLS 得到參數 \(\theta_0=\tfrac13,\;\theta_1=1.5\)，所以線是 \(f(x)=1.5x+\tfrac13\)。</p>
+  <ul>
+    <li>參數：\(1.5\) 和 \(\tfrac13\)（模型的旋鈕）。</li>
+    <li>預測值：\(f(1)\approx1.83,\;f(2)\approx3.33,\;f(3)\approx4.83\)（線上的高度）。</li>
+    <li>誤差：真實 \(y\) 減預測，約 \(-0.17,\;+0.33,\;-0.17\)。</li>
+  </ul>
+<pre><span class="k">import</span> numpy <span class="k">as</span> np
+y = np.array([<span class="n">2.</span>, <span class="n">3.</span>, <span class="n">5.</span>])
+X = np.c_[np.ones(<span class="n">3</span>), [<span class="n">1</span>,<span class="n">2</span>,<span class="n">3</span>]]     <span class="c"># 資料：加截距欄</span>
+theta = np.linalg.solve(X.T@X, X.T@y)     <span class="c"># 參數</span>
+y_hat = X @ theta                         <span class="c"># 預測值</span></pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>數學</th></tr>
+  <tr><td><code>import numpy as np</code></td><td>借 NumPy，暱稱 <code>np</code>。</td><td>—</td></tr>
+  <tr><td><code>np.array([2., 3., 5.])</code></td><td>用清單做出向量。小數點讓型別是 float。</td><td>\(y\)</td></tr>
+  <tr><td><code>np.ones(3)</code></td><td>三個 1。</td><td>截距欄</td></tr>
+  <tr><td><code>np.c_[..., [1,2,3]]</code></td><td>左右併欄，得到 \(3\times 2\) 矩陣。</td><td>設計矩陣 \(X\)</td></tr>
+  <tr><td><code>X.T @ X</code></td><td><code>.T</code> 轉置，<code>@</code> 矩陣乘。</td><td>\(X^\top X\)</td></tr>
+  <tr><td><code>np.linalg.solve(A, b)</code></td><td>解線性方程組 \(A\theta=b\)。</td><td>參數 \(\theta\)</td></tr>
+  <tr><td><code>X @ theta</code></td><td>矩陣乘向量。</td><td>預測值 \(X\theta\)</td></tr>
+</table>
+</div>
+
+<h3 id="ch1-pred">1.5 對新病人做預測</h3>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag pred">預測值</span> 新樣本</div>
+    \[
+      y_{\text{new}}=f(x_{\text{new}})=\theta_1^\star x_{\text{new}}+\theta_0^\star
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td><b>預測值</b>。新病人的 BMI 代入已擬合的線。</td></tr>
+    <tr><th>儀表讀法</th><td>紅叉 = 模型猜的風險；紅點 = 真實風險（模型訓練時沒看過）。兩者差多少才是「新資料表現」。</td></tr>
+    <tr><th>程式哪一行</th><td><code>y_new = obj.predict(X_test)</code>。注意：這裡<strong>不再</strong> <code>fit</code>。</td></tr>
+    <tr><th>你要會的應用</th><td>解釋：「這條線對新病人預測的是風險分數。」監督式學習的目標是新資料有用，不是把訓練點背下來。</td></tr>
+  </table>
+</div>
+<div class="box warn">
+  <div class="lbl">應用鐵律</div>
+  訓練點上很準 ≠ 模型好。高次多項式可以把訓練誤差壓到接近 0，對新病人卻亂猜。這叫 overfitting。所以：<b>測試誤差才算數。</b>
+</div>
+
+<h3 id="ch1-err">1.6 誤差儀表：MSE（以及 L1）</h3>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag err">誤差</span> 均方誤差 MSE（LinearRegression 內建最小化的東西）</div>
+    \[
+      J(\theta)=\frac{1}{2n}\sum_{i=1}^n\bigl(f_\theta(x^{(i)})-y^{(i)}\bigr)^2
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td><b>誤差</b>。預測值和答案差多少，平方後平均。前因子 \(\tfrac12\) 只為了微分好看，不改誰最小。</td></tr>
+    <tr><th>儀表讀法</th><td>愈小愈貼。大誤差被平方放大，所以離群點會把線拉歪。L1 誤差 \(\frac1n\sum|f-y|\) 對離群較穩，但 sklearn 預設線性迴歸用的是 MSE。</td></tr>
+    <tr><th>程式哪一行</th><td><code>from sklearn.metrics import mean_squared_error</code><br/><code>mean_squared_error(y_train, y_hat_train)</code> ← 訓練誤差<br/><code>mean_squared_error(y_test, y_hat_test)</code> ← <b>這個才拿來評模型</b></td></tr>
+    <tr><th>你要會的應用</th><td>講義多特徵線性模型：訓練 MSE \(\approx1118\)，3 筆測試 \(\approx668\)；亂數預測約 \(16000\)。比較模型時對齊同一測試集。選次數、選 \(\lambda\) 用驗證集 MSE，最後一次才看測試集。</td></tr>
+  </table>
+</div>
+<p><code>fit</code> 做的事寫成儀表就是 \(\min_\theta J(\theta)\)：轉動參數，直到訓練 MSE 不能再小。這只能保證「訓練集擬合好」，不能保證測試好。</p>
+
+<div class="demo" id="ch1-demo">
+  <h4>互動 1 · 這條線在預測什麼？殘差是誤差</h4>
+  <p class="note">數學：\(f(x)=\theta_1 x+\theta_0\)。紅點是截距 \((0,\theta_0)\)，一定在 \(x=0\) 的縱軸上。<b>只拖斜率</b>時紅點不動，直線繞它旋轉；<b>只拖截距</b>時紅點上下移，直線平行移動。黑點是資料；橘色垂直線是殘差。底部橫軸是 \(y=0\)，左側縱軸是 \(x=0\)。</p>
+  <div class="ctrls">
+    <label>斜率 \(\theta_1\) <input id="linS" type="range" min="-4" max="18" step="0.1" value="8"/> <span id="linSv"></span></label>
+    <label>截距 \(\theta_0\) <input id="linI" type="range" min="-40" max="180" step="1" value="50"/> <span id="linIv"></span></label>
+    <button id="linFit">最佳擬合（= fit）</button>
+    <button class="sec" id="linReset">重置</button>
+  </div>
+  <canvas id="linCanvas" width="820" height="380"></canvas>
+  <div class="stats">
+    <div class="stat">訓練 MSE（誤差）= <b id="linMSE">—</b></div>
+    <div class="stat" id="linHint">紅點固定時改斜率 = 旋轉；改截距 = 平移</div>
+    <div class="stat" id="linEq">—</div>
+  </div>
+</div>
+
+<div class="quiz">
+  <b>小測驗。</b> 報告「模型好不好」應該看哪個數字？
+  <div>
+    <button onclick="grade(this,false,'q1r')">A. <code>fit</code> 之後的訓練 MSE</button>
+    <button onclick="grade(this,true,'q1r')">B. 沒參加訓練的測試 MSE</button>
+    <button onclick="grade(this,false,'q1r')">C. 斜率 \(\theta_1\) 愈大愈好</button>
+  </div>
+  <div id="q1r"></div>
+</div>
+
+<div class="lab" id="lab2">
+  <div class="lbl">應用例題 2 · 用線性迴歸完整走一遍</div>
+  <h4>題目</h4>
+  <div class="ask">
+    八位同學的讀書時數與考試分數如下。<br/>
+    時數 \(x\)：1, 2, 3, 4, 5, 6, 7, 8<br/>
+    分數 \(y\)：52, 55, 60, 68, 72, 78, 85, 90<br/>
+    請用 <code>LinearRegression</code>：(1) 擬合直線；(2) 用一句人話解釋斜率；(3) 預測「讀 3.5 小時」的分數；(4) 算出訓練 MSE；(5) 把最後兩筆當測試集，再算測試 MSE，並說明哪個數字拿來報告。
+  </div>
+  <p><b>選哪個模型？</b> 目標 \(y\) 是連續分數 → 迴歸。看起來大致成直線 → 先用線性模型。後面若彎了再換多項式。</p>
+  <p><b>分析步驟：</b> 造機器 → <code>fit</code> 學參數 → 讀 <code>coef_</code> 解釋這條線 → <code>predict</code> 新的 \(x\) → 用 MSE 看誤差（訓練 vs 測試）。</p>
+<pre><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">from</span> sklearn.linear_model <span class="k">import</span> LinearRegression
+<span class="k">from</span> sklearn.metrics <span class="k">import</span> mean_squared_error
+
+hours = np.array([<span class="n">1</span>,<span class="n">2</span>,<span class="n">3</span>,<span class="n">4</span>,<span class="n">5</span>,<span class="n">6</span>,<span class="n">7</span>,<span class="n">8</span>]).reshape(-<span class="n">1</span>, <span class="n">1</span>)
+scores = np.array([<span class="n">52</span>,<span class="n">55</span>,<span class="n">60</span>,<span class="n">68</span>,<span class="n">72</span>,<span class="n">78</span>,<span class="n">85</span>,<span class="n">90</span>])
+
+X_tr, y_tr = hours[:<span class="n">6</span>], scores[:<span class="n">6</span>]      <span class="c"># 前 6 筆訓練</span>
+X_te, y_te = hours[<span class="n">6</span>:], scores[<span class="n">6</span>:]      <span class="c"># 後 2 筆測試（沒拿去 fit）</span>
+
+model = LinearRegression()
+model.fit(X_tr, y_tr)                    <span class="c"># 參數</span>
+<span class="k">print</span>(<span class="s">'斜率 θ1 ='</span>, model.coef_[<span class="n">0</span>])
+<span class="k">print</span>(<span class="s">'截距 θ0 ='</span>, model.intercept_)
+
+x_new = np.array([[<span class="n">3.5</span>]])                <span class="c"># 仍要兩層括號：1 筆樣本 × 1 個特徵</span>
+<span class="k">print</span>(<span class="s">'讀 3.5 小時，預測'</span>, model.predict(x_new)[<span class="n">0</span>], <span class="s">'分'</span>)
+
+<span class="k">print</span>(<span class="s">'訓練 MSE'</span>, mean_squared_error(y_tr, model.predict(X_tr)))
+<span class="k">print</span>(<span class="s">'測試 MSE'</span>, mean_squared_error(y_te, model.predict(X_te)))</pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>在算什麼</th></tr>
+  <tr><td><code>np.array([...]).reshape(-1, 1)</code></td><td><code>reshape(-1,1)</code> 把一排數字變成「很多列、1 欄」的表。sklearn 的 \(X\) 必須是二維：列=樣本、欄=特徵。<code>-1</code> 表示「列數請自動算」。</td><td>資料 \(X\)</td></tr>
+  <tr><td><code>hours[:6]</code></td><td>切片：編號 0 到 5（前 6 筆）。</td><td>訓練集</td></tr>
+  <tr><td><code>hours[6:]</code></td><td>從編號 6 到結尾（最後 2 筆）。</td><td>測試集</td></tr>
+  <tr><td><code>LinearRegression()</code></td><td>造機器，空括號=預設。</td><td>選模型：直線</td></tr>
+  <tr><td><code>model.fit(X_tr, y_tr)</code></td><td>只看訓練集，解 OLS。</td><td><b>參數</b> \(\theta\)</td></tr>
+  <tr><td><code>model.coef_[0]</code></td><td><code>coef_</code> 是陣列；<code>[0]</code> 第一格=斜率。沒有括號。</td><td>讀參數</td></tr>
+  <tr><td><code>np.array([[3.5]])</code></td><td>外層「一批樣本」、內層「這筆的特徵」。少一層括號 sklearn 會抱怨維度。</td><td>新的 \(x\)</td></tr>
+  <tr><td><code>model.predict(...)[0]</code></td><td><code>predict</code> 回傳陣列，<code>[0]</code> 取出唯一一個數字。</td><td><b>預測值</b></td></tr>
+  <tr><td><code>mean_squared_error(真, 預測)</code></td><td>兩個引數順序：先答案、後預測。</td><td><b>誤差</b></td></tr>
+</table>
+<p><b>如何讀結果（這條線在預測什麼）：</b></p>
+<ul>
+  <li>斜率若約 5～6：每多讀 1 小時，模型預測分數約多 5～6 分（相關，不是保證）。</li>
+  <li><code>predict([[3.5]])</code> 是「讀 3.5 小時的考試分數預測」，不是真實考卷。</li>
+  <li>報告模型好不好：看<strong>測試 MSE</strong>。訓練 MSE 只告訴你這 6 個點貼不貼。</li>
+</ul>
+<p><b>自己改一改：</b> 把測試集改成最後 3 筆，看測試 MSE 會不會變。這就是「測試集太小，數字會跳」——所以真實作業要用更多資料或交叉驗證。</p>
+</div>
+
+<!-- ===================== CH2 ===================== -->
+<h2 id="ch2">第 2 章　選一條彎的線（多項式迴歸）</h2>
+<p>來源：<em>Polynomial Regression</em>。直線不夠彎時，不是換一套優化器，而是<b>換特徵</b>：把 \(x,x^2,\ldots,x^p\) 加進去，<code>LinearRegression</code> 照舊。</p>
+
+<h3 id="ch2-phi">2.1 特徵映射在算什麼</h3>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag data">資料</span> 多項式特徵（還不是預測）</div>
+    \[
+      \phi(x)=\begin{bmatrix}1\\x\\x^2\\\vdots\\x^p\end{bmatrix},
+      \qquad
+      f_\theta(x)=\sum_{j=0}^{p}\theta_j x^j=\theta^\top\phi(x)
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td>\(\phi(x)\) 是<b>資料轉換</b>（新特徵）。\(\theta^\top\phi(x)\) 才是<b>預測值</b>。\(\theta\) 仍是<b>參數</b>。</td></tr>
+    <tr><th>儀表讀法</th><td>對 BMI 非線性（曲線），對參數仍是線性，所以還能 <code>fit</code>。次數 \(p\) 是你選的旋鈕，不是 <code>fit</code> 算出來的。</td></tr>
+    <tr><th>程式哪一行</th><td><code>PolynomialFeatures(degree=p).fit_transform(X)</code> ← 算 \(\phi(x)\)<br/><code>LinearRegression().fit(phi, y)</code> ← 算參數 \(\theta\)<br/><code>model.predict(X_new)</code> ← 算預測值<br/>實務用 Pipeline 串起來，避免對測試集洩漏。</td></tr>
+    <tr><th>你要會的應用</th><td>選 \(p\)：太小欠擬合，太大過擬合。用驗證／holdout MSE 選，不要看「訓練曲線有多貼」。</td></tr>
+  </table>
+</div>
+<p>講義原文曾寫 \(\sum \theta_p x^p\)，應為 \(\sum_j \theta_j x^j\)。</p>
+<p><code>PolynomialFeatures(degree=2).fit_transform([[2]])</code> 這句可以拆開讀：造一個「二次特徵機器」→ 立刻對資料 <code>[[2]]</code>（注意：外層清單表示「一批樣本」，內層 <code>[2]</code> 是「這筆有一個特徵，值是 2」）做轉換 → 得到 <code>[[1, 2, 4]]</code> 即 \((1,x,x^2)\)。連著寫 <code>A().b()</code> 叫<strong>串接</strong>：前一個的結果當後一個的物件。</p>
+<div class="box py">
+  <div class="lbl">Python · Pipeline 三行分別在算什麼</div>
+<pre><span class="k">from</span> sklearn.pipeline <span class="k">import</span> Pipeline
+<span class="k">from</span> sklearn.preprocessing <span class="k">import</span> PolynomialFeatures
+<span class="k">from</span> sklearn.linear_model <span class="k">import</span> LinearRegression
+model = Pipeline([
+    (<span class="s">'poly'</span>, PolynomialFeatures(degree=<span class="n">3</span>, include_bias=<span class="k">False</span>)),  <span class="c"># 資料：做 φ(x)</span>
+    (<span class="s">'lin'</span>, LinearRegression())                                 <span class="c"># 參數：對 φ 做 OLS</span>
+])
+model.fit(X_bmi, y_train)     <span class="c"># 參數</span>
+y_pred = model.predict(X_test)  <span class="c"># 預測值</span></pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>在算什麼</th></tr>
+  <tr><td><code>from sklearn.pipeline import Pipeline</code></td><td>只借 Pipeline 類別。中間的點是「子資料夾」。</td><td>—</td></tr>
+  <tr><td><code>Pipeline([ ... ])</code></td><td>引數是<strong>清單</strong>。清單裡每一項是 <code>(名字字串, 機器)</code> 元組，依序執行。</td><td>把「做特徵」和「線性迴歸」焊成一台機器。</td></tr>
+  <tr><td><code>PolynomialFeatures(degree=3, include_bias=False)</code></td><td>兩個關鍵字引數：次數 3；不要自己產全 1 欄（截距留給下一步）。</td><td>資料：\(\phi(x)\)</td></tr>
+  <tr><td><code>LinearRegression()</code></td><td>造直線機器。</td><td>下一步才算參數</td></tr>
+  <tr><td><code>model.fit(...)</code></td><td>對整條管線學習。先 transform 再 OLS。</td><td>參數 \(\theta\)</td></tr>
+  <tr><td><code>model.predict(X_test)</code></td><td>測試 \(X\) 也會先做同樣的 \(\phi\)，再預測。這就是 Pipeline 的好處。</td><td>預測值</td></tr>
+</table>
+<p class="note">Python 清單裡可以換行。行首多出來的空白必須對齊，否則會 <code>IndentationError</code>。</p>
+</div>
+
+<h3 id="ch2-choose">2.2 怎麼選次數 \(p\)</h3>
+<p>\(p\) 是 <b>超參數</b>：它決定模型有多彎，但不是 <code>fit</code> 從訓練損失裡學出來的。講義在 BMI 20 點上畫 \(p=1,3,5,10,20\)：次數升高，訓練曲線愈貼，並不表示愈好。</p>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag hyp">超參數</span> 次數 \(p\)（選模型，不是算參數）</div>
+    \[
+      p \in \{1,2,3,\ldots\} \quad\text{你指定；fit 只負責在該 }p\text{ 下算 }\theta
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td>不在算。這是你的選擇：模型有多複雜。</td></tr>
+    <tr><th>儀表讀法</th><td>看<strong>holdout / 驗證 MSE</strong>。訓練 MSE 隨 \(p\) 下降幾乎必然；測試 MSE 會先降後升（過擬合）。</td></tr>
+    <tr><th>程式哪一行</th><td><code>PolynomialFeatures(degree=p)</code> 的 <code>degree</code>。用迴圈試一組 \(p\)，每組都 <code>fit</code> 在訓練集、評分在驗證集。</td></tr>
+    <tr><th>你要會的應用</th><td>選使驗證 MSE 最低的 \(p\)。多特徵時項數是 \(\binom{d+p}{p}\)，很快爆炸 → 第 4 章用正則化。</td></tr>
+  </table>
+</div>
+<div class="box py">
+  <div class="lbl">Python · 第一次看「for 迴圈」：試一排 \(p\)</div>
+<pre><span class="k">from</span> sklearn.metrics <span class="k">import</span> mean_squared_error
+<span class="k">for</span> p <span class="k">in</span> [<span class="n">1</span>, <span class="n">3</span>, <span class="n">8</span>, <span class="n">15</span>]:          <span class="c"># 依序把 1,3,8,15 放進變數 p</span>
+    model = Pipeline([
+        (<span class="s">'poly'</span>, PolynomialFeatures(degree=p, include_bias=<span class="k">False</span>)),
+        (<span class="s">'lin'</span>, LinearRegression())
+    ])
+    model.fit(X_tr, y_tr)          <span class="c"># 只在訓練集學參數</span>
+    val = mean_squared_error(y_val, model.predict(X_val))  <span class="c"># 驗證誤差</span>
+    <span class="k">print</span>(<span class="s">'p='</span>, p, <span class="s">'val MSE='</span>, val)</pre>
+<table class="syn">
+  <tr><th>語法</th><th>作用</th></tr>
+  <tr><td><code>for p in [1, 3, 8, 15]:</code></td><td>迴圈。讀成「對清單裡每一個值，暫時叫它 p，做下面縮排的那些行」。<code>:</code> 不能省。</td></tr>
+  <tr><td>下面多縮進一層的行</td><td>屬於這個 for。換 p 就重做一次 fit 與評分。</td></tr>
+  <tr><td><code>mean_squared_error(y_val, model.predict(X_val))</code></td><td>先預測、再算與答案的平均平方差。兩個引數：真實、預測。</td></tr>
+  <tr><td><code>print('p=', p, 'val MSE=', val)</code></td><td>字串與數字可以混著印。</td></tr>
+</table>
+<p>看印出來哪一個 <code>val MSE</code> 最小，就選那個 \(p\)。不要看訓練 MSE。</p>
+</div>
+
+<div class="demo" id="ch2-demo">
+  <h4>互動 2 · 選 \(p\)：只看紅點（holdout）的誤差</h4>
+  <p class="note">棕線是真函數，藍點是訓練，紅點是沒拿來 <code>fit</code> 的 holdout。藍線是模型預測。請同時看兩個 MSE：訓練變好但 holdout 變差 = 過擬合，不要選那個 \(p\)。</p>
+  <div class="ctrls">
+    <label>次數 \(p\)（超參數） <input id="polyDeg" type="range" min="1" max="16" step="1" value="3"/> <span id="polyDegV"></span></label>
+    <label>雜訊 <input id="polyNoise" type="range" min="0" max="0.4" step="0.02" value="0.1"/> <span id="polyNoiseV"></span></label>
+    <button id="polyResample">重新抽樣</button>
+  </div>
+  <canvas id="polyCanvas" width="820" height="380"></canvas>
+  <div class="stats">
+    <div class="stat">Train MSE（僅供參考）<b id="polyTr">—</b></div>
+    <div class="stat">Holdout MSE（拿來選 \(p\)）<b id="polyHo">—</b></div>
+    <div class="stat" id="polyDiag">—</div>
+  </div>
+</div>
+
+<div class="lab" id="lab3">
+  <div class="lbl">應用例題 3 · 氣溫與冰淇淋：選次數 \(p\)</div>
+  <h4>題目</h4>
+  <div class="ask">
+    氣溫 \(x\)（已縮到 0～1）與冰淇淋銷量 \(y\) 大致像一條彎的曲線，不是直線。請對 \(p=1,2,6\) 各擬合一次多項式迴歸，每次都在<strong>同一組驗證點</strong>上算 MSE。選驗證 MSE 最小的 \(p\)。最後用一句話解釋：你選的那條曲線在預測什麼。
+  </div>
+  <p><b>選哪個模型？</b> \(y\) 連續 → 迴歸。你懷疑非線性 → 多項式特徵 + 線性迴歸（對 \(\theta\) 仍是線性）。\(p\) 是超參數，用驗證誤差選，不能看訓練曲線有多貼。</p>
+<pre><span class="k">import</span> numpy <span class="k">as</span> np
+<span class="k">from</span> sklearn.preprocessing <span class="k">import</span> PolynomialFeatures
+<span class="k">from</span> sklearn.linear_model <span class="k">import</span> LinearRegression
+<span class="k">from</span> sklearn.pipeline <span class="k">import</span> Pipeline
+<span class="k">from</span> sklearn.metrics <span class="k">import</span> mean_squared_error
+
+rng = np.random.default_rng(<span class="n">0</span>)           <span class="c"># 隨機數產生器；0 讓每次結果相同</span>
+X = rng.random((<span class="n">40</span>, <span class="n">1</span>))                  <span class="c"># 40 列 1 欄，均勻在 0～1</span>
+y = np.cos(<span class="n">1.5</span> * np.pi * X[:, <span class="n">0</span>]) + rng.normal(<span class="n">0</span>, <span class="n">0.1</span>, size=<span class="n">40</span>)
+
+X_tr, X_val = X[:<span class="n">25</span>], X[<span class="n">25</span>:]
+y_tr, y_val = y[:<span class="n">25</span>], y[<span class="n">25</span>:]
+
+<span class="k">for</span> p <span class="k">in</span> [<span class="n">1</span>, <span class="n">2</span>, <span class="n">6</span>]:
+    model = Pipeline([
+        (<span class="s">'poly'</span>, PolynomialFeatures(degree=p, include_bias=<span class="k">False</span>)),
+        (<span class="s">'lin'</span>, LinearRegression())
+    ])
+    model.fit(X_tr, y_tr)                <span class="c"># 只在訓練集學 θ</span>
+    tr = mean_squared_error(y_tr, model.predict(X_tr))
+    va = mean_squared_error(y_val, model.predict(X_val))
+    <span class="k">print</span>(<span class="s">'p='</span>, p, <span class="s">'訓練 MSE='</span>, round(tr, <span class="n">4</span>), <span class="s">'驗證 MSE='</span>, round(va, <span class="n">4</span>))</pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>在算什麼</th></tr>
+  <tr><td><code>np.random.default_rng(0)</code></td><td>造隨機數機。數字 0 是種子，方便作業重現。</td><td>—</td></tr>
+  <tr><td><code>rng.random((40, 1))</code></td><td>引數是形狀元組 <code>(列, 欄)</code>。</td><td>資料 \(X\)</td></tr>
+  <tr><td><code>np.cos(1.5 * np.pi * X[:,0])</code></td><td><code>X[:,0]</code> 取出那一欄變成一維，才能做三角函數。這是講義同一條真函數。</td><td>真實關係（你平常不知道）</td></tr>
+  <tr><td><code>rng.normal(0, 0.1, size=40)</code></td><td>平均 0、標準差 0.1 的雜訊，加到 \(y\) 上。</td><td>模擬測量誤差</td></tr>
+  <tr><td><code>for p in [1, 2, 6]:</code></td><td>超參數迴圈。縮排裡每次換一個 \(p\) 重 fit。</td><td>選模型</td></tr>
+  <tr><td><code>Pipeline([...])</code></td><td>先做 \(\phi(x)\) 再 OLS。測試時也會自動做同樣的 \(\phi\)。</td><td>模型</td></tr>
+  <tr><td><code>include_bias=False</code></td><td>不要重複截距欄。</td><td>設定</td></tr>
+  <tr><td><code>round(tr, 4)</code></td><td>印到小數第 4 位，好讀。</td><td>—</td></tr>
+</table>
+<p><b>怎麼選：</b> 看三行裡<strong>驗證 MSE 最小</strong>的 \(p\)。通常 \(p=1\) 欠擬合，\(p=6\) 可能過擬合。訓練 MSE 最小的那個不要自動交出去。</p>
+<p><b>這條線在預測什麼：</b> 「給一個 0～1 的氣溫編碼，模型預測冰淇淋銷量。」不是預測氣溫。</p>
+<p><b>自己改一改：</b> 把 <code>[1,2,6]</code> 加上 <code>12</code>，看驗證 MSE 會不會反而變差——那就是過擬合。</p>
+</div>
+
+<!-- ===================== CH3 ===================== -->
+<h2 id="ch3">第 3 章　分類：預測的是類別／機率</h2>
+<p>來源：<em>Classification and Logistic Regression</em>。\(y\) 不再是分數，而是類別。名稱叫 logistic <em>regression</em>，工作是分類。</p>
+
+<h3 id="ch3-def">3.1 分類要預測什麼</h3>
+<ul>
+  <li>迴歸：線的高度 = 預測的連續值。</li>
+  <li>分類：平面被切成幾塊區域，新點落在哪塊就預測哪個 class。界線叫 decision boundary。</li>
+  <li>\(K=2\) 是二元分類；Iris 有 3 類（Setosa / Versicolour / Virginica），150 朵、4 個公分特徵。</li>
+</ul>
+<div class="box py">
+  <div class="lbl">Python · 擬合在算參數；predict 在算類別</div>
+<pre><span class="k">from</span> sklearn.linear_model <span class="k">import</span> LogisticRegression
+logreg = LogisticRegression(C=<span class="n">1e5</span>)   <span class="c"># C 很大 ≈ 幾乎不正則化</span>
+logreg.fit(X[:, :<span class="n">2</span>], y)               <span class="c"># 參數</span>
+y_hat = logreg.predict(X_new)          <span class="c"># 預測值：類別 0/1/2</span>
+p_hat = logreg.predict_proba(X_new)    <span class="c"># 機率</span></pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>在算什麼</th></tr>
+  <tr><td><code>LogisticRegression(C=1e5)</code></td><td>造分類機器。<code>C=1e5</code> 是超參數（\(C=1/\lambda\)，很大 ≈ 幾乎不正則化）。</td><td>設定，不是資料</td></tr>
+  <tr><td><code>X[:, :2]</code></td><td>NumPy 切片：所有列、欄 0 到 1（前兩個特徵，例如花萼長寬）。</td><td>資料</td></tr>
+  <tr><td><code>logreg.fit(...)</code></td><td>學參數。</td><td>參數 \(\theta\)</td></tr>
+  <tr><td><code>predict(X_new)</code></td><td>回傳類別編號（0,1 或 0,1,2）。</td><td>預測的<b>類別</b></td></tr>
+  <tr><td><code>predict_proba(X_new)</code></td><td>回傳陣列，每列加起來是 1。第二欄 <code>[:,1]</code> 常是正類機率。</td><td><b>機率</b></td></tr>
+</table>
+</div>
+<p>不要把 \(\{0,1\}\) 當連續分數丟進 <code>LinearRegression</code>：輸出可以 \(&lt;0\) 或 \(&gt;1\)，而且離群點會把邊界拉歪。講義用這個反例帶出 sigmoid。</p>
+
+<h3 id="ch3-sig">3.2 分數 → 機率</h3>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag pred">預測值</span> 線性分數　再　<span class="tag prob">機率</span> Sigmoid</div>
+    \[
+      z=\theta^\top x,
+      \qquad
+      f_\theta(x)=\sigma(z)=\frac{1}{1+e^{-z}}=P_\theta(y=1\mid x)
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td>\(z\) 是分數（可正可負）。\(\sigma(z)\) 是<b>機率</b>（被擠進 0 到 1）。決策時通常 \(\sigma\ge 0.5\) 則預測正類，等價於 \(z\ge 0\)。</td></tr>
+    <tr><th>儀表讀法</th><td>\(\sigma=0.92\) 讀成「模型估計屬於正類的機率約 92%」，不是迴歸分數 0.92。\(\sigma=0.5\) 的位置就是決策邊界。</td></tr>
+    <tr><th>程式哪一行</th><td><code>logreg.decision_function(X)</code> ≈ \(z\)<br/><code>logreg.predict_proba(X)[:,1]</code> = \(\sigma(z)\)<br/><code>logreg.predict(X)</code> = 類別（把機率切成 0/1）</td></tr>
+    <tr><th>你要會的應用</th><td>解釋：「這條邊界把 Setosa 和非 Setosa 切開；此點 \(P(\text{Setosa})\approx 0.92\)。」</td></tr>
+  </table>
+</div>
+<p>性質只要會用：\(z\to+\infty\) 機率趨近 1；\(z=0\) 時 \(\sigma=0.5\)。導數 \(\sigma(1-\sigma)\) 是優化器內部用的，你呼叫 <code>fit</code> 即可。</p>
+
+<div class="demo">
+  <h4>互動 3 · \(\sigma(\theta_1 x+\theta_0)\)：斜率改變時繞 \(x=0\) 那一點變陡</h4>
+  <p class="note">\(z=\theta_1 x+\theta_0\)。在 \(x=0\) 處 \(z=\theta_0\)，所以曲線永遠通過紅點 \(\bigl(0,\sigma(\theta_0)\bigr)\)。只改 \(\theta_1\)：紅點不動，曲線繞它變陡或變緩。虛線 \(0.5\) 是決策閾值，交點在 \(x=-\theta_0/\theta_1\)（會隨斜率移動，這是對的）。</p>
+  <div class="ctrls">
+    <label>\(\theta_1\)（陡度） <input id="sigA" type="range" min="-8" max="8" step="0.1" value="1"/> <span id="sigAv"></span></label>
+    <label>\(\theta_0\)（\(x=0\) 的分數） <input id="sigB" type="range" min="-8" max="8" step="0.1" value="0"/> <span id="sigBv"></span></label>
+  </div>
+  <canvas id="sigCanvas" width="820" height="320"></canvas>
+</div>
+
+<h3 id="ch3-loss">3.3 分類的誤差儀表（交叉熵）</h3>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag err">誤差</span> 二元交叉熵（<code>fit</code> 在最小化的東西）</div>
+    \[
+      J(\theta)=-\frac1n\sum_i\Bigl[y^{(i)}\log p^{(i)}+(1-y^{(i)})\log(1-p^{(i)})\Bigr],
+      \quad p=\sigma(\theta^\top x)
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td><b>誤差</b>。機率預測得有多離譜。答對且很有把握 → 損失接近 0；把 1 說成 0.01 → 損失很大。</td></tr>
+    <tr><th>儀表讀法</th><td>這是訓練用的損失。對外報告分類好不好，通常改看 <b>accuracy</b>（對幾成）或錯誤率，而且要在測試集上算。</td></tr>
+    <tr><th>程式哪一行</th><td><code>logreg.fit(X, y)</code> 內部最小化交叉熵（外加一點正則化，由 \(C=1/\lambda\) 控制）。<br/>報告：<code>logreg.score(X_test, y_test)</code> = 測試準確率。</td></tr>
+    <tr><th>你要會的應用</th><td>不要用訓練準確率宣稱模型強。選 \(C\) 用驗證集。</td></tr>
+  </table>
+</div>
+
+<h3 id="ch3-soft">3.4 Softmax：多類的機率儀表</h3>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag prob">機率</span> Softmax（三類以上）</div>
+    \[
+      P(y=k\mid x)=\frac{e^{\theta_k^\top x}}{\sum_{\ell}e^{\theta_\ell^\top x}}
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td>每個類一個分數 \(\theta_k^\top x\)，指數後再除以總和 → <b>一組加起來為 1 的機率</b>。</td></tr>
+    <tr><th>儀表讀法</th><td>輸出向量例如 \((0.7,0.2,0.1)\)：預測第 1 類，因為 0.7 最大。兩類時 softmax 就是 sigmoid，不必當新算法。</td></tr>
+    <tr><th>程式哪一行</th><td><code>LogisticRegression(multi_class='multinomial').fit(X,y)</code><br/><code>predict_proba</code> 給 \(K\) 維機率；<code>predict</code> 取 argmax。</td></tr>
+    <tr><th>你要會的應用</th><td>Iris 三類：解釋「這點最可能是 Virginica，機率 …」。One-vs-all 是備案：每類一個「我 vs 其餘」。</td></tr>
+  </table>
+</div>
+
+<div class="demo" id="ch3-demo">
+  <h4>互動 4 · 左邊用線性迴歸硬切 0.5；右邊才是邏輯迴歸</h4>
+  <p class="note">著色 = 預測類別。黑線是決策邊界：線性迴歸為 \(\theta^\top x=0.5\)，logistic 為 \(\theta^\top x=0\)（即 \(\sigma=0.5\)）。勾選離群點：OLS 邊界會被拉走，logistic 較穩。</p>
+  <div class="ctrls">
+    <label><input type="checkbox" id="clsOutlier"/> 加入遠方離群點</label>
+    <button id="clsRedraw">重新繪製</button>
+  </div>
+  <div class="grid2">
+    <div><canvas id="clsLin" width="400" height="340"></canvas><div class="note">線性迴歸 + 閾值 0.5（不建議）</div></div>
+    <div><canvas id="clsLog" width="400" height="340"></canvas><div class="note">Logistic：預測類別區域</div></div>
+  </div>
+</div>
+
+<div class="demo">
+  <h4>互動 5 · Softmax 儀表：三個分數變成三個機率</h4>
+  <div class="ctrls">
+    <label>\(z_1\) <input id="sm1" type="range" min="-5" max="5" step="0.1" value="2"/> <span id="sm1v"></span></label>
+    <label>\(z_2\) <input id="sm2" type="range" min="-5" max="5" step="0.1" value="1"/> <span id="sm2v"></span></label>
+    <label>\(z_3\) <input id="sm3" type="range" min="-5" max="5" step="0.1" value="0"/> <span id="sm3v"></span></label>
+  </div>
+  <canvas id="smCanvas" width="820" height="220"></canvas>
+  <div class="stats" id="smStats"></div>
+</div>
+
+<div class="lab" id="lab4">
+  <div class="lbl">應用例題 4 · 這朵花是 Setosa 嗎？</div>
+  <h4>題目</h4>
+  <div class="ask">
+    用 Iris 的花萼長、寬，把類別 0（Setosa）當正類、其餘當負類。請：(1) 擬合邏輯迴歸；(2) 印出測試準確率（不是訓練準確率）；(3) 對一朵新花 sepal length=5.1、sepal width=3.5，印出「是 Setosa 的機率」並用一句人話解釋；(4) 說明為什麼這裡不用線性迴歸。
+  </div>
+  <p><b>選哪個模型？</b> \(y\) 是兩類 → 二元分類 → <code>LogisticRegression</code>。輸出要當機率，所以用 sigmoid，不用 MSE 直線。</p>
+<pre><span class="k">from</span> sklearn <span class="k">import</span> datasets
+<span class="k">from</span> sklearn.linear_model <span class="k">import</span> LogisticRegression
+<span class="k">from</span> sklearn.model_selection <span class="k">import</span> train_test_split
+
+iris = datasets.load_iris()
+X = iris.data[:, :<span class="n">2</span>]                         <span class="c"># 所有列、前兩欄（花萼長寬）</span>
+y = (iris.target == <span class="n">0</span>).astype(int)           <span class="c"># True/False 再轉成 1/0</span>
+
+X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=<span class="n">0.3</span>, random_state=<span class="n">0</span>)
+
+clf = LogisticRegression(C=<span class="n">1e5</span>)
+clf.fit(X_tr, y_tr)                          <span class="c"># 參數</span>
+<span class="k">print</span>(<span class="s">'測試準確率'</span>, clf.score(X_te, y_te))   <span class="c"># 誤差儀表（愈高愈好）</span>
+
+new_flower = [[<span class="n">5.1</span>, <span class="n">3.5</span>]]                    <span class="c"># 1 筆、2 個特徵</span>
+<span class="k">print</span>(<span class="s">'預測類別'</span>, clf.predict(new_flower)[<span class="n">0</span>])
+<span class="k">print</span>(<span class="s">'P(是 Setosa)'</span>, clf.predict_proba(new_flower)[<span class="n">0</span>, <span class="n">1</span>])</pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>在算什麼</th></tr>
+  <tr><td><code>iris.data[:, :2]</code></td><td>NumPy 切片：<code>:</code> 全部列，<code>:2</code> 欄 0 與 1。</td><td>資料 \(X\)</td></tr>
+  <tr><td><code>iris.target == 0</code></td><td>逐格比較，得到 True/False 陣列。</td><td>誰是 Setosa</td></tr>
+  <tr><td><code>.astype(int)</code></td><td>把 True/False 變成 1/0。邏輯迴歸要數字標籤。</td><td>目標 \(y\)</td></tr>
+  <tr><td><code>train_test_split(..., test_size=0.3, random_state=0)</code></td><td>隨機切 70/30。回傳四個陣列，左邊四個名字對應接。</td><td>訓練／測試</td></tr>
+  <tr><td><code>LogisticRegression(C=1e5)</code></td><td><code>1e5=100000</code>，正則化很弱，接近講義設定。</td><td>超參數 \(C\)</td></tr>
+  <tr><td><code>clf.fit(X_tr, y_tr)</code></td><td>只在訓練集上學 \(\theta\)。</td><td>參數</td></tr>
+  <tr><td><code>clf.score(X_te, y_te)</code></td><td>在測試集上算準確率。分類不要用訓練準確率報分。</td><td><b>測試誤差儀表</b></td></tr>
+  <tr><td><code>[[5.1, 3.5]]</code></td><td>兩層清單：一批裡的一筆，兩個特徵。</td><td>新樣本</td></tr>
+  <tr><td><code>predict(...)</code></td><td>0 或 1。</td><td>預測類別</td></tr>
+  <tr><td><code>predict_proba(...)[0, 1]</code></td><td>第 0 筆、第 1 欄（正類機率）。二維陣列用 <code>[列, 欄]</code>。</td><td><b>機率</b></td></tr>
+</table>
+<p><b>這條「線」在預測什麼：</b> 不是預測花萼有多長，而是「在這組長寬下，屬於 Setosa 的機率」。若機率 0.93，口述：「模型估計這朵是 Setosa 的機會約 93%。」</p>
+<p><b>為什麼不用線性迴歸：</b> 直線可以預測出 1.4 或 -0.2，不能當機率；離群點還會把邊界拉歪。</p>
+<p><b>自己改一改：</b> 換成三類、用 <code>iris.target</code> 原樣當 \(y\)（0/1/2），看 <code>predict_proba</code> 會變成三個數字、加起來約 1——那就是 Softmax。</p>
+</div>
+
+<!-- ===================== CH4 ===================== -->
+<h2 id="ch4">第 4 章　測試誤差才算數；用正則化選更穩的模型</h2>
+<p>來源：<em>Regularization</em>。玩具資料 \(y=\cos(1.5\pi x)+\varepsilon\)。次數 1 太直（欠擬合），次數 30 穿過每個訓練點但在點之間亂晃（過擬合）。</p>
+
+<h3 id="ch4-fail">4.1 兩種失敗：用兩塊儀表診斷</h3>
+<table>
+  <tr><th>診斷</th><th>訓練誤差</th><th>Holdout／測試誤差</th><th>你要做的</th></tr>
+  <tr><td>欠擬合 underfitting</td><td>高</td><td>高</td><td>加特徵、加次數、換更有彈性的模型、確認有 <code>fit</code> 成功</td></tr>
+  <tr><td>過擬合 overfitting</td><td>低</td><td>高</td><td>降低次數、加資料、加正則化 \(\lambda\)</td></tr>
+  <tr><td>可用</td><td>低</td><td>低</td><td>再拿到測試集上做最後一次確認</td></tr>
+</table>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag err">誤差</span> 好模型的定義（Applied ML 的評分規則）</div>
+    \[
+      \frac1m\sum_{i=1}^m L\bigl(\dot y^{(i)}, f_\theta(\dot x^{(i)})\bigr)
+      \quad\text{在 holdout／測試集上}
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td><b>誤差</b>（或 1−準確率）。點號 \(\dot x\) 表示「沒拿來訓練的點」。</td></tr>
+    <tr><th>儀表讀法</th><td>迴歸用 MSE；分類常用錯誤率 \(\frac1m\sum\mathbb{I}(\hat y\neq y)\)。這個數字才代表新資料。</td></tr>
+    <tr><th>程式哪一行</th><td><code>mean_squared_error(y_holdout, model.predict(X_holdout))</code><br/>或 <code>model.score(X_test, y_test)</code></td></tr>
+    <tr><th>你要會的應用</th><td>任何「我的模型比較好」都要附測試（或比賽指定的 holdout）數字。</td></tr>
+  </table>
+</div>
+
+<h3 id="ch4-split">4.2 三個資料夾：誰能看、誰不能看</h3>
+<table>
+  <tr><th>集合</th><th>程式角色</th><th>可以做什麼</th></tr>
+  <tr><td>Training</td><td><code>fit(X_tr, y_tr)</code></td><td>只在這裡算參數 \(\theta\)</td></tr>
+  <tr><td>Development / validation</td><td><code>score(X_val, y_val)</code></td><td>選 \(p\)、選 \(\lambda\)、選要不要 Lasso</td></tr>
+  <tr><td>Test</td><td>最後一次 <code>score(X_te, y_te)</code></td><td>報告成績。開發過程不碰</td></tr>
+</table>
+<p>常見切分約 70/15/15。開發集與測試集要像上線時會遇到的資料（分布一致）。流程：訓練 → 看驗證誤差改模型 → 滿意後才看測試誤差。</p>
+<div class="box py">
+  <div class="lbl">Python · 隨機切三份（語法）</div>
+<pre><span class="k">from</span> sklearn.model_selection <span class="k">import</span> train_test_split
+X_tr, X_tmp, y_tr, y_tmp = train_test_split(X, y, test_size=<span class="n">0.3</span>, random_state=<span class="n">0</span>)
+X_val, X_te, y_val, y_te = train_test_split(X_tmp, y_tmp, test_size=<span class="n">0.5</span>, random_state=<span class="n">0</span>)</pre>
+<table class="syn">
+  <tr><th>語法</th><th>作用</th></tr>
+  <tr><td><code>train_test_split(X, y, test_size=0.3, random_state=0)</code></td><td>把資料隨機切成兩份。回傳<strong>四個</strong>東西：訓練X、其餘X、訓練y、其餘y。<code>test_size=0.3</code> 表示其餘佔 30%。<code>random_state=0</code> 讓每次切法相同（可重現）。</td></tr>
+  <tr><td>左邊四個名字</td><td>必須四個，順序固定。這叫解包。</td></tr>
+  <tr><td>第二行再切 <code>X_tmp</code></td><td>把那 30% 再對半，得到約 15% 驗證、15% 測試。</td></tr>
+</table>
+</div>
+<div class="box mis">
+  <div class="lbl">常見錯法</div>
+  把驗證集併回訓練再在同一驗證集上報分；或用訓練 MSE 選多項式次數。兩者都會讓數字虛好看，測試一到就垮。
+</div>
+
+<h3 id="ch4-ridge">4.3 Ridge：把過大的參數壓小</h3>
+<p>過擬合的高次多項式，權重往往極大（講義看到 \(10^3\)–\(10^7\)）。Ridge = 線性迴歸的 MSE 再加上「參數別太大」。</p>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag err">誤差</span> + <span class="tag par">參數懲罰</span> Ridge 目標</div>
+    \[
+      J(\theta)=\frac{1}{2n}\sum_i\bigl(y^{(i)}-\theta^\top\phi(x^{(i)})\bigr)^2+\frac{\lambda}{2}\lVert\theta\rVert_2^2
+    \]
+    閉式（<code>fit</code> 在解這個）：\(\theta=(X^\top X+\lambda I)^{-1}X^\top y\)
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td>第一項仍是訓練誤差；第二項是參數大小。\(\lambda\) 是<b>超參數</b>：愈大，權重被壓得愈小，曲線愈平滑。</td></tr>
+    <tr><th>儀表讀法</th><td>\(\lambda=0\) 就是普通 OLS。\(\lambda\) 太大會欠擬合（線太平）。sklearn 把 \(\lambda\) 叫 <code>alpha</code>。</td></tr>
+    <tr><th>程式哪一行</th><td><code>Ridge(alpha=0.1).fit(X, y)</code> ← 算參數<br/>不要寫 <code>Ridge(alpha=0).fit</code> 還以為有正則化。</td></tr>
+    <tr><th>你要會的應用</th><td>高次多項式仍想用時，加 Ridge。\(\lambda\) 在驗證集上選。截距通常不正則化（sklearn 預設如此）。特徵先 <code>StandardScaler</code>。</td></tr>
+  </table>
+</div>
+<div class="box warn">
+  <div class="lbl">為什麼不能在訓練集上選 \(\lambda\)</div>
+  若把 \(\lambda\) 也對訓練損失最小化，優化器會把它設成 0（等於取消懲罰）。所以 \(\lambda\) 必須用驗證誤差選。
+</div>
+
+<h3 id="ch4-lasso">4.4 Lasso：把沒用的特徵變成 0</h3>
+<div class="dash">
+  <div class="eqbox">
+    <div class="ttl"><span class="tag par">參數</span> L1 懲罰 → 稀疏</div>
+    \[
+      J(\theta)=\frac1n\sum L(y,\theta^\top x)+\lambda\sum_j|\theta_j|
+    \]
+  </div>
+  <table class="meta">
+    <tr><th>這在算什麼</th><td>仍然是「誤差 + 懲罰參數」。換成絕對值後，許多 \(\theta_j\) 會<b>正好變成 0</b>（稀疏 = 自動特徵選擇）。</td></tr>
+    <tr><th>儀表讀法</th><td>Ridge：係數縮小但很少到 0。Lasso：沒用的線會貼在 0。要解釋「哪些特徵被留下」就用 Lasso。</td></tr>
+    <tr><th>程式哪一行</th><td><code>Lasso(alpha=λ).fit(X_scaled, y)</code> 或 <code>LassoCV(...).fit</code>（交叉驗證選 \(\alpha\)）<br/>然後看 <code>lasso.coef_</code> 哪些是 0。</td></tr>
+    <tr><th>你要會的應用</th><td>講義示範 10 個特徵只有 3 個有訊號：Lasso 大約只留下那 3 個。必須先標準化。</td></tr>
+  </table>
+</div>
+<table>
+  <tr><th>你的目的</th><th>選</th><th>sklearn</th></tr>
+  <tr><td>穩定、特徵共線、不需要丟掉變數</td><td>Ridge</td><td><code>Ridge(alpha=λ)</code></td></tr>
+  <tr><td>自動選特徵、模型好解釋</td><td>Lasso</td><td><code>Lasso(alpha=λ)</code> / <code>LassoCV</code></td></tr>
+</table>
+<div class="box py">
+  <div class="lbl">Python · 哪一行在選 \(\lambda\)、哪一行在算參數</div>
+<pre><span class="k">from</span> sklearn.linear_model <span class="k">import</span> Ridge, LassoCV
+<span class="k">from</span> sklearn.preprocessing <span class="k">import</span> StandardScaler
+X_scaled = StandardScaler().fit_transform(X)          <span class="c"># 資料：標準化</span>
+ridge = Ridge(alpha=<span class="n">0.1</span>).fit(X_scaled, y)             <span class="c"># 參數（α 是你或驗證集給的）</span>
+lasso = LassoCV(cv=<span class="n">10</span>).fit(X_scaled, y)               <span class="c"># 超參數 α + 參數 θ</span>
+<span class="k">print</span>(lasso.alpha_, lasso.coef_)                      <span class="c"># 讀選中的 λ 與稀疏係數</span></pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>在算什麼</th></tr>
+  <tr><td><code>from ... import Ridge, LassoCV</code></td><td>一次借兩個類別，逗號隔開。</td><td>—</td></tr>
+  <tr><td><code>StandardScaler().fit_transform(X)</code></td><td>串接：先造標準化器，立刻對 \(X\) 做「減平均、除標準差」。各欄變成同一量綱。</td><td>資料轉換（L1/L2 都需要）</td></tr>
+  <tr><td><code>Ridge(alpha=0.1).fit(X_scaled, y)</code></td><td>造完立刻 fit。回傳的就是學好的機器，存進 <code>ridge</code>。</td><td>參數（\(\lambda=0.1\) 是你給的超參數）</td></tr>
+  <tr><td><code>LassoCV(cv=10).fit(...)</code></td><td><code>cv=10</code>：自動做 10 折交叉驗證來選 \(\alpha\)。</td><td>先選超參數，再算參數</td></tr>
+  <tr><td><code>lasso.alpha_</code>、<code>lasso.coef_</code></td><td>兩個屬性。後者是一排數字，接近 0 的可視為丟掉的特徵。</td><td>讀 \(\lambda^\star\) 與稀疏 \(\theta\)</td></tr>
+</table>
+</div>
+
+<div class="demo" id="ch4-demo">
+  <h4>互動 6 · 固定 14 次多項式，用 \(\lambda\) 選平滑程度</h4>
+  <p class="note">看 Holdout MSE 最低的 \(\lambda\)，那才是你該選的。訓練 MSE 最低的通常是 \(\lambda\approx 0\)，不要選它。</p>
+  <div class="ctrls">
+    <label>\(\lambda\)（超參數，對數） <input id="ridgeLam" type="range" min="-4" max="2" step="0.1" value="-1"/> <span id="ridgeLamV"></span></label>
+  </div>
+  <canvas id="ridgeCanvas" width="820" height="380"></canvas>
+  <div class="stats">
+    <div class="stat">\(\lVert\theta\rVert_2\)（參數大小）<b id="ridgeNrm">—</b></div>
+    <div class="stat">Train MSE <b id="ridgeTr">—</b></div>
+    <div class="stat">Holdout MSE（拿來選 \(\lambda\)）<b id="ridgeHo">—</b></div>
+  </div>
+</div>
+
+<div class="demo">
+  <h4>互動 7 · Ridge 縮小 vs Lasso 歸零</h4>
+  <p class="note">6 個特徵裡只有 3 個真正有用。向右增加 \(\lambda\)。解釋模型時看 Lasso 還留下誰。</p>
+  <div class="ctrls">
+    <label>\(\lambda\) <input id="pathLam" type="range" min="-3" max="2" step="0.05" value="-1.5"/> <span id="pathLamV"></span></label>
+  </div>
+  <div class="grid2">
+    <div><canvas id="pathRidge" width="400" height="300"></canvas><div class="note">Ridge 係數（參數，幾乎都不為 0）</div></div>
+    <div><canvas id="pathLasso" width="400" height="300"></canvas><div class="note">Lasso 係數（沒用的會變成 0）</div></div>
+  </div>
+  <div class="stats" id="pathStats"></div>
+</div>
+
+<div class="lab" id="lab5">
+  <div class="lbl">應用例題 5 · 十個特徵只有三個有用：誰該用 Ridge、誰該用 Lasso</div>
+  <h4>題目</h4>
+  <div class="ask">
+    用 <code>make_regression</code> 做出 80 筆、10 個特徵、其中只有 3 個真正影響 \(y\) 的假資料。請：(1) 先標準化；(2) 切訓練／測試；(3) 分別 fit <code>Ridge(alpha=1)</code> 與 <code>LassoCV</code>；(4) 印出兩種模型的測試 MSE；(5) 印出 Lasso 哪些係數不是 0。最後寫兩句：這條線在預測什麼；你若要「解釋哪些變數有用」該交哪一個模型。
+  </div>
+  <p><b>選哪個模型？</b> \(y\) 連續 → 迴歸。特徵多、可能無關 → 若要穩定用 Ridge；若要自動丟掉變數用 Lasso。\(\lambda\)（sklearn 叫 <code>alpha</code>）用驗證／CV 選，不能在訓練集上選。</p>
+<pre><span class="k">from</span> sklearn.datasets <span class="k">import</span> make_regression
+<span class="k">from</span> sklearn.preprocessing <span class="k">import</span> StandardScaler
+<span class="k">from</span> sklearn.linear_model <span class="k">import</span> Ridge, LassoCV
+<span class="k">from</span> sklearn.model_selection <span class="k">import</span> train_test_split
+<span class="k">from</span> sklearn.metrics <span class="k">import</span> mean_squared_error
+<span class="k">import</span> numpy <span class="k">as</span> np
+
+X, y = make_regression(n_samples=<span class="n">80</span>, n_features=<span class="n">10</span>, n_informative=<span class="n">3</span>,
+                       noise=<span class="n">8</span>, random_state=<span class="n">0</span>)
+X = StandardScaler().fit_transform(X)        <span class="c"># 各欄減平均、除標準差</span>
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=<span class="n">0.25</span>, random_state=<span class="n">0</span>)
+
+ridge = Ridge(alpha=<span class="n">1.0</span>).fit(X_tr, y_tr)
+lasso = LassoCV(cv=<span class="n">5</span>).fit(X_tr, y_tr)        <span class="c"># 內部用驗證折選 alpha</span>
+
+<span class="k">print</span>(<span class="s">'Ridge 測試 MSE'</span>, mean_squared_error(y_te, ridge.predict(X_te)))
+<span class="k">print</span>(<span class="s">'Lasso 測試 MSE'</span>, mean_squared_error(y_te, lasso.predict(X_te)))
+<span class="k">print</span>(<span class="s">'Lasso 選到的 alpha'</span>, lasso.alpha_)
+<span class="k">print</span>(<span class="s">'Lasso 係數'</span>, np.round(lasso.coef_, <span class="n">3</span>))
+<span class="k">print</span>(<span class="s">'非零特徵編號'</span>, np.where(np.abs(lasso.coef_) &gt; <span class="n">1e-6</span>)[<span class="n">0</span>])</pre>
+<table class="syn">
+  <tr><th>這一行</th><th>語法在幹嘛</th><th>在算什麼</th></tr>
+  <tr><td><code>make_regression(n_samples=80, n_features=10, n_informative=3, noise=8, random_state=0)</code></td><td>全部是關鍵字引數：80 筆、10 欄、3 欄真正有訊號、再加雜訊。回傳 <code>X, y</code>。</td><td>假資料（方便你核對 Lasso 有沒有找回那 3 欄）</td></tr>
+  <tr><td><code>StandardScaler().fit_transform(X)</code></td><td>串接：造標準化器並立刻轉換。正則化前必做，否則單位大的欄會被不公平懲罰。</td><td>資料轉換</td></tr>
+  <tr><td><code>test_size=0.25</code></td><td>測試佔 25%。</td><td>切分</td></tr>
+  <tr><td><code>Ridge(alpha=1.0).fit(X_tr, y_tr)</code></td><td>造完立刻在<strong>訓練集</strong> fit。測試集不能放進來。</td><td>參數（L2）</td></tr>
+  <tr><td><code>LassoCV(cv=5).fit(...)</code></td><td><code>cv=5</code>：訓練集再切 5 折選 <code>alpha</code>，等於用驗證誤差選 \(\lambda\)。</td><td>超參數 + 參數</td></tr>
+  <tr><td><code>mean_squared_error(y_te, ...predict(X_te))</code></td><td>只在測試集評分。這才拿來比較 Ridge 與 Lasso。</td><td><b>測試誤差</b></td></tr>
+  <tr><td><code>np.round(lasso.coef_, 3)</code></td><td>每個係數留 3 位小數。</td><td>讀參數</td></tr>
+  <tr><td><code>np.where(np.abs(lasso.coef_) &gt; 1e-6)[0]</code></td><td>哪些位置的絕對值大於極小值。<code>[0]</code> 取出編號陣列。</td><td>Lasso 留下的特徵</td></tr>
+</table>
+<p><b>這條線在預測什麼：</b> 用 10 個數字輸入，預測一個連續的 \(y\)（假的「銷量／風險」）。Ridge 會 10 個係數都還在（縮小）；Lasso 應大約只留下 3 個非零——那就是「自動特徵選擇」。</p>
+<p><b>交作業時怎麼寫：</b> 「比較兩個模型用測試 MSE。若目的是解釋哪些變數有用，交 Lasso 的非零係數；若只在乎預測穩，Ridge 通常更穩。」不要寫訓練 MSE 當結論。</p>
+<p class="note">進階提醒：更嚴謹時，<code>StandardScaler</code> 只在訓練集上 <code>fit</code>，再 <code>transform</code> 測試集，避免用到測試集的平均。上面為了短，是對全部 \(X\) 標準化。</p>
+<p><b>自己改一改：</b> 把 <code>n_informative=3</code> 改成 10（每個特徵都有用），看 Lasso 還會不會砍成 3 個——這時不該再為了稀疏而硬用很大的 \(\lambda\)。</p>
+</div>
+
+<h2 id="cheatsheet">公式儀表速查</h2>
+<table>
+  <tr><th>式子</th><th>在算</th><th>sklearn 哪一行</th><th>拿來做什麼</th></tr>
+  <tr><td>\(f(x)=\theta^\top x\)</td><td><span class="tag pred">預測值</span></td><td><code>predict</code></td><td>解釋這條線在預測什麼</td></tr>
+  <tr><td>\(\theta=(X^\top X)^{-1}X^\top y\)</td><td><span class="tag par">參數</span></td><td><code>LinearRegression.fit</code></td><td>讀 <code>coef_</code> / <code>intercept_</code></td></tr>
+  <tr><td>MSE \(\frac1{2n}\sum(f-y)^2\)</td><td><span class="tag err">誤差</span></td><td><code>mean_squared_error</code></td><td>比較模型；看測試集</td></tr>
+  <tr><td>\(\phi(x)=(1,x,\ldots,x^p)\)</td><td><span class="tag data">資料</span></td><td><code>PolynomialFeatures</code></td><td>讓線變彎</td></tr>
+  <tr><td>\(p\)、\(\lambda\)、\(C\)</td><td><span class="tag hyp">超參數</span></td><td>建構子參數</td><td>用驗證集選</td></tr>
+  <tr><td>\(\sigma(\theta^\top x)\)</td><td><span class="tag prob">機率</span></td><td><code>predict_proba</code></td><td>解釋「有多像正類」</td></tr>
+  <tr><td>交叉熵 \(J(\theta)\)</td><td><span class="tag err">誤差</span></td><td><code>LogisticRegression.fit</code> 內部</td><td>訓練用；報告改看測試準確率</td></tr>
+  <tr><td>Softmax</td><td><span class="tag prob">機率</span></td><td><code>predict_proba</code>（多類）</td><td>三類以上誰最大</td></tr>
+  <tr><td>Ridge \(\lambda\lVert\theta\rVert_2^2\)</td><td><span class="tag par">參數懲罰</span></td><td><code>Ridge(alpha=λ).fit</code></td><td>壓過擬合</td></tr>
+  <tr><td>Lasso \(\lambda\lVert\theta\rVert_1\)</td><td><span class="tag par">參數懲罰</span></td><td><code>Lasso.fit</code> 後看 <code>coef_==0</code></td><td>選特徵</td></tr>
+</table>
+
+<h2 id="index">詞彙 INDEX</h2>
+<p>每個詞先記「它是資料、參數、預測、誤差還是超參數」。</p>
+<div id="glossary"></div>
+
+<h2 id="practice">應用練習（這門課會考的用法）</h2>
+<div class="quiz">
+  <p><b>P1.</b> <code>obj.predict(X_new)</code> 算出來的是？
+    <button onclick="grade(this,true,'p1')">預測值 \(f(x)\)</button>
+    <button onclick="grade(this,false,'p1')">參數 \(\theta\)</button>
+    <button onclick="grade(this,false,'p1')">測試誤差</button>
+  </p><div id="p1"></div>
+  <p><b>P2.</b> 要在 \(p=1,3,10\) 裡選多項式次數，看哪個數字？
+    <button onclick="grade(this,false,'p2')">三個模型的訓練 MSE，取最小</button>
+    <button onclick="grade(this,true,'p2')">三個模型的驗證 MSE，取最小</button>
+    <button onclick="grade(this,false,'p2')">斜率最大的那個</button>
+  </p><div id="p2"></div>
+  <p><b>P3.</b> 邏輯迴歸 <code>predict_proba</code> 得到 0.92，你怎麼解釋這條「線」？
+    <button onclick="grade(this,true,'p3')">模型估計 \(P(y=1\mid x)\approx 0.92\)</button>
+    <button onclick="grade(this,false,'p3')">風險分數是 0.92（迴歸）</button>
+  </p><div id="p3"></div>
+  <p><b>P4.</b> 訓練誤差很低、驗證誤差很高。下一步？
+    <button onclick="grade(this,false,'p4')">再加大多項式次數</button>
+    <button onclick="grade(this,true,'p4')">降低複雜度或加大 \(\lambda\)，再看驗證誤差</button>
+    <button onclick="grade(this,false,'p4')">把驗證集併入訓練並用同一驗證集報分</button>
+  </p><div id="p4"></div>
+  <p><b>P5.</b> 最終報告「演算法 A 比 B 好」，應引用？
+    <button onclick="grade(this,true,'p5')">測試集誤差（之前沒用來選模型）</button>
+    <button onclick="grade(this,false,'p5')">訓練集誤差</button>
+  </p><div id="p5"></div>
+  <p><b>P6.</b> <code>model.fit(...)</code> 這一行主要在算？
+    <button onclick="grade(this,true,'p6')">參數 \(\theta\)</button>
+    <button onclick="grade(this,false,'p6')">測試誤差</button>
+  </p><div id="p6"></div>
+  <p><b>P7.</b> <code>xs[0]</code> 是清單的第幾個？
+    <button onclick="grade(this,true,'p7')">第一個（編號從 0 起）</button>
+    <button onclick="grade(this,false,'p7')">第零個不存在，會報錯</button>
+  </p><div id="p7"></div>
+  <p><b>P8.</b> <code>from sklearn.linear_model import LinearRegression</code> 在做什麼？
+    <button onclick="grade(this,true,'p8')">向工具箱借出這個類別，後面才能寫 LinearRegression()</button>
+    <button onclick="grade(this,false,'p8')">已經開始擬合資料</button>
+  </p><div id="p8"></div>
+</div>
+
+<div class="box ex">
+  <div class="lbl">上機作業（對準「會用」）</div>
+  <ol>
+    <li>用 BMI 擬合直線。寫三句話：這條線在預測什麼；\(\theta_1\) 怎麼讀；測試 MSE 是多少（不要只報訓練 MSE）。</li>
+    <li>對 \(p=1,3,8,15\) 各 fit 一次，做一張表：Train MSE / Val MSE。圈出你要提交的 \(p\)，並寫為什麼不是 Train MSE 最小的那個。</li>
+    <li>Iris 二分類：印出一個新點的 <code>predict_proba</code>，用一句人話解釋。</li>
+    <li>同一組高次多項式，掃一排 <code>Ridge(alpha=...)</code>，用驗證 MSE 選 <code>alpha</code>，最後只在測試集上報一次分數。</li>
+  </ol>
+</div>
+
+<div class="foot">
+  教材依講義改編（Cornell Applied Machine Learning / CS5785）。本頁把公式當儀表：預測值、誤差、參數、超參數分開讀，並對到 sklearn 的行。互動圖在瀏覽器內運算，無需後端。
+</div>
+</main>
+</div>
+<script>
+/* ---------- 繁簡切換（原文為台灣繁體，簡體由 OpenCC + 教材詞彙表生成） ---------- */
+let pageLang = localStorage.getItem('ml-ui-lang') || 'zh-Hant';
+let toHansFn = (s)=>s;
+const origText = new WeakMap();
+const TITLE_HANT = document.title;
+const PHRASES = [
+  ['監督式學習','监督学习'],['機器學習','机器学习'],['應用機器學習','应用机器学习'],
+  ['資料集','数据集'],['訓練集','训练集'],['測試集','测试集'],['驗證集','验证集'],
+  ['開發集','开发集'],['留出集','留出集'],['欄位名稱','字段名'],['欄位','字段'],
+  ['幾列幾欄','几行几列'],['列數、欄數','行数、列数'],['列數','行数'],['欄數','列数'],
+  ['欄名','列名'],['這一欄','这一列'],['那一欄','那一列'],['前兩欄','前两列'],
+  ['只要 bmi 的欄','只要 bmi 的列'],['名叫 bmi 的欄','名叫 bmi 的列'],
+  ['所有列','所有行'],['最後 20 列','最后 20 行'],['前 5 列','前 5 行'],
+  ['每一列','每一行'],['列=樣本','行=样本'],['欄=特徵','列=特征'],
+  ['列=人','行=人'],['欄=變數','列=变量'],['單一行','单独一行'],
+  ['機率','概率'],['几率','概率'],['準確率','准确率'],
+  ['過擬合','过拟合'],['欠擬合','欠拟合'],['正則化','正则化'],
+  ['超參數','超参数'],['特徵選擇','特征选择'],['特徵映射','特征映射'],
+  ['特徵空間','特征空间'],['特徵矩陣','特征矩阵'],['特徵','特征'],
+  ['迴歸','回归'],['分類','分类'],['函數','函数'],['優化','优化'],
+  ['訓練','训练'],['預測','预测'],['學習','学习'],['變數','变量'],
+  ['資料夾','文件夹'],['文件夹','文件夹'],['資料','数据'],['资料','数据'],
+  ['程式碼','代码'],['程式','程序'],
+  ['資訊','信息'],['资讯','信息'],['軟體','软件'],['软体','软件'],['檔案','文件'],['档案','文件'],
+  ['預設','默认'],['预设','默认'],['記憶體','内存'],['记忆体','内存'],
+  ['物件','对象'],['回傳','返回'],['回传','返回'],['迴圈','循环'],['循环','循环'],
+  ['陣列','数组'],['阵列','数组'],['字串','字符串'],['布林','布尔'],['套件','库'],
+  ['模組','模块'],['模块','模块'],['載入','加载'],['加载','加载'],
+  ['螢幕','屏幕'],['屏幕','屏幕'],['視窗','窗口'],['窗口','窗口'],
+  ['滑桿','滑块'],['滑杆','滑块'],['互動','交互'],['交互','交互'],
+  ['清單','列表'],['清单','列表'],['品質','质量'],
+  ['標準差','标准差'],['均方誤差','均方误差'],['點號','点号'],['点号','点号'],
+  ['關鍵字引數','关键字参数'],['关键字引数','关键字参数'],['引數','参数'],
+  ['註解','注释'],['注释','注释'],['縮排','缩进'],['缩排','缩进'],
+  ['管線','流水线'],['管线','流水线'],
+  ['標籤','标签'],['儀表板','仪表盘'],['仪表板','仪表盘'],['儀表','仪表'],['仪表','仪表'],
+  ['欄名','列名'],['栏名','列名'],['這一欄','这一列'],['这一栏','这一列'],
+  ['那一欄','那一列'],['那一栏','那一列'],['前兩欄','前两列'],['前两栏','前两列'],
+  ['所有列','所有行'],['最後 20 列','最后 20 行'],['最后 20 列','最后 20 行'],
+  ['前 5 列','前 5 行'],['每一列','每一行'],['列數','行数'],['列数','行数'],['欄數','列数'],['栏数','列数']
+].sort((a,b)=>b[0].length-a[0].length);
+
+function hans(s){
+  if(s==null || s==='') return s;
+  let out = toHansFn(s);
+  for(const [a,b] of PHRASES){
+    if(out.indexOf(a)!==-1) out = out.split(a).join(b);
+  }
+  return out;
+}
+function t(s){ return pageLang==='zh-Hans' ? hans(s) : s; }
+
+function walkConvert(root){
+  const skipTag = {SCRIPT:1,STYLE:1,TEXTAREA:1,CANVAS:1};
+  function rec(node){
+    if(node.nodeType===1){
+      if(node.id==='langSwitch') return;
+      if(skipTag[node.tagName]) return;
+      if(node.classList && (node.classList.contains('katex') || node.classList.contains('katex-html') || node.classList.contains('katex-mathml'))) return;
+      for(const c of [...node.childNodes]) rec(c);
+    } else if(node.nodeType===3){
+      const p = node.parentElement;
+      if(!p || p.closest('#langSwitch') || p.closest('.katex, .katex-html, .katex-mathml')) return;
+      const inCode = p.closest('pre, code');
+      if(inCode){
+        const allow = p.classList.contains('c') || (p.classList.contains('s') && /[\u4e00-\u9fff]/.test(node.nodeValue));
+        if(!allow) return;
+      }
+      if(!origText.has(node)) origText.set(node, node.nodeValue);
+      const o = origText.get(node);
+      node.nodeValue = pageLang==='zh-Hans' ? hans(o) : o;
+    }
+  }
+  rec(root);
+}
+function convertAttrs(){
+  document.querySelectorAll('[placeholder],[title]').forEach(el=>{
+    if(el.closest('#langSwitch')) return;
+    ['placeholder','title'].forEach(attr=>{
+      if(!el.hasAttribute(attr)) return;
+      const key = 'hant'+attr;
+      if(el.dataset[key]==null) el.dataset[key] = el.getAttribute(attr);
+      el.setAttribute(attr, t(el.dataset[key]));
+    });
+  });
+}
+function renderGlossary(){
+  if(!gEl) return;
+  gEl.innerHTML='';
+  GLOSS.forEach(([en,zh,def,href])=>{
+    const d=document.createElement('div'); d.className='idx-item';
+    d.innerHTML=`<b><a href="${href}">${en}</a></b>　${zh}<br/><span class="note">${def}</span>`;
+    gEl.appendChild(d);
+  });
+}
+function setLang(lang){
+  pageLang = lang;
+  localStorage.setItem('ml-ui-lang', lang);
+  document.documentElement.lang = lang==='zh-Hans' ? 'zh-Hans' : 'zh-Hant';
+  document.title = t(TITLE_HANT);
+  document.getElementById('btnHant').classList.toggle('on', lang!=='zh-Hans');
+  document.getElementById('btnHans').classList.toggle('on', lang==='zh-Hans');
+  renderGlossary();
+  walkConvert(document.body);
+  convertAttrs();
+  try{ drawLin(); drawPoly(); drawSig(); drawCls(); drawSM(); drawRidge(); drawPath(); }catch(e){}
+}
+function initOpenCC(){
+  if(window.OpenCC && OpenCC.Converter){
+    try{ toHansFn = OpenCC.Converter({ from: 'twp', to: 'cn' }); }
+    catch(e){
+      try{ toHansFn = OpenCC.Converter({ from: 'tw', to: 'cn' }); }
+      catch(e2){ toHansFn = (s)=>s; }
+    }
+  }
+}
+
+/* ---------- tiny math ---------- */
+const zeros=(r,c)=>Array.from({length:r},()=>Array(c).fill(0));
+function T(A){const r=A.length,c=A[0].length,B=zeros(c,r);for(let i=0;i<r;i++)for(let j=0;j<c;j++)B[j][i]=A[i][j];return B}
+function mm(A,B){const r=A.length,n=B.length,c=B[0].length,C=zeros(r,c);
+  for(let i=0;i<r;i++)for(let k=0;k<n;k++){const aik=A[i][k];for(let j=0;j<c;j++)C[i][j]+=aik*B[k][j]} return C}
+function mv(A,x){return A.map(row=>row.reduce((s,v,i)=>s+v*x[i],0))}
+function addI(A,lam){const n=A.length,B=A.map(r=>r.slice());for(let i=0;i<n;i++)B[i][i]+=lam;return B}
+function solve(A0,b0){
+  const n=A0.length,A=A0.map((r,i)=>r.concat([b0[i]]));
+  for(let k=0;k<n;k++){
+    let p=k; for(let i=k+1;i<n;i++) if(Math.abs(A[i][k])>Math.abs(A[p][k])) p=i;
+    [A[k],A[p]]=[A[p],A[k]];
+    const piv=A[k][k]; if(Math.abs(piv)<1e-12) return null;
+    for(let j=k;j<=n;j++) A[k][j]/=piv;
+    for(let i=0;i<n;i++) if(i!==k){const f=A[i][k]; for(let j=k;j<=n;j++) A[i][j]-=f*A[k][j]}
+  }
+  return A.map(r=>r[n]);
+}
+function finite(th){return th && th.every(Number.isFinite)}
+function ridge(X,y,lam){
+  const Xt=T(X), XtX=mm(Xt,X), Xty=mv(Xt,y);
+  const A=addI(XtX, lam);
+  A[0][0]-=lam; // do not penalize intercept
+  const th=solve(A,Xty);
+  return finite(th)?th:null;
+}
+function ols(X,y){return ridge(X,y,0)}
+function mse(y,yh){let s=0; for(let i=0;i<y.length;i++){const e=y[i]-yh[i]; s+=e*e} return s/y.length}
+function sigmoid(z){ if(z>=0){const e=Math.exp(-z); return 1/(1+e)} const e=Math.exp(z); return e/(1+e)}
+function softmax(z){const m=Math.max(...z), e=z.map(v=>Math.exp(v-m)), s=e.reduce((a,b)=>a+b,0); return e.map(v=>v/s)}
+function vandermonde(xs,p){
+  /* map x in [0,1] to u in [-1,1] for numerical stability */
+  return xs.map(x=>{const u=2*x-1, r=[1]; let v=1; for(let j=1;j<=p;j++){v*=u; r.push(v)} return r})
+}
+function linspace(a,b,n){return Array.from({length:n},(_,i)=>a+i*(b-a)/(n-1))}
+function mean(a){return a.reduce((x,y)=>x+y,0)/a.length}
+function std(a){const m=mean(a); return Math.sqrt(mean(a.map(x=>(x-m)**2))||1e-12)}
+
+/* ---------- canvas axes ---------- */
+function axes(cv,xr,yr){
+  const ctx=cv.getContext('2d'), W=cv.width, H=cv.height, p=50;
+  const x2=(x)=>p+(x-xr[0])/(xr[1]-xr[0])*(W-2*p);
+  const y2=(y)=>H-p-(y-yr[0])/(yr[1]-yr[0])*(H-2*p);
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(p, p, W-2*p, H-2*p);
+  ctx.clip();
+  ctx.strokeStyle='#c9c0b3'; ctx.lineWidth=1;
+  if(xr[0]<=0 && xr[1]>=0){ ctx.beginPath(); ctx.moveTo(x2(0),p); ctx.lineTo(x2(0),H-p); ctx.stroke(); }
+  if(yr[0]<=0 && yr[1]>=0){ ctx.beginPath(); ctx.moveTo(p,y2(0)); ctx.lineTo(W-p,y2(0)); ctx.stroke(); }
+  ctx.restore();
+  ctx.strokeStyle='#1c1917'; ctx.lineWidth=1.2;
+  ctx.strokeRect(p, p, W-2*p, H-2*p);
+  ctx.fillStyle='#7c746a'; ctx.font='12px IBM Plex Mono,monospace';
+  ctx.fillText(xr[0].toFixed(1), p, H-p+16);
+  ctx.fillText(xr[1].toFixed(1), W-p-28, H-p+16);
+  ctx.fillText(yr[0].toFixed(1), 4, H-p);
+  ctx.fillText(yr[1].toFixed(1), 4, p+10);
+  if(xr[0]<=0 && xr[1]>=0) ctx.fillText('x=0', x2(0)+4, H-p+16);
+  return {ctx,x2,y2,W,H,p,xr,yr};
+}
+function inPlot(A,x,y){return x>=A.xr[0]&&x<=A.xr[1]&&y>=A.yr[0]&&y<=A.yr[1]}
+function scatter(A,pts,c,r=4){
+  A.ctx.save();
+  A.ctx.beginPath(); A.ctx.rect(A.p,A.p,A.W-2*A.p,A.H-2*A.p); A.ctx.clip();
+  A.ctx.fillStyle=c; for(const [x,y] of pts){A.ctx.beginPath(); A.ctx.arc(A.x2(x),A.y2(y),r,0,6.28); A.ctx.fill()}
+  A.ctx.restore();
+}
+function line(A,xs,ys,c,w=2){
+  A.ctx.save();
+  A.ctx.beginPath(); A.ctx.rect(A.p,A.p,A.W-2*A.p,A.H-2*A.p); A.ctx.clip();
+  A.ctx.strokeStyle=c; A.ctx.lineWidth=w; A.ctx.beginPath();
+  xs.forEach((x,i)=>{const X=A.x2(x),Y=A.y2(ys[i]); i?A.ctx.lineTo(X,Y):A.ctx.moveTo(X,Y)}); A.ctx.stroke();
+  A.ctx.restore();
+}
+function mark(A,x,y,c,label){
+  if(!inPlot(A,x,y)) return;
+  A.ctx.fillStyle=c; A.ctx.beginPath(); A.ctx.arc(A.x2(x),A.y2(y),6,0,6.28); A.ctx.fill();
+  A.ctx.strokeStyle='#fff'; A.ctx.lineWidth=1.5; A.ctx.stroke();
+  if(label){ A.ctx.fillStyle=c; A.ctx.font='12px Noto Sans TC,sans-serif'; A.ctx.fillText(label, A.x2(x)+8, A.y2(y)-8); }
+}
+
+/* ---------- ch1 linear demo ---------- */
+function mulberry(a){return function(){let t=a+=0x6D2B79F5; t=Math.imul(t^t>>>15,t|1); t^=t+Math.imul(t^t>>>7,t|61); return ((t^t>>>14)>>>0)/4294967296}}
+function makeDiabetes(){
+  const pts=[], rng=mulberry(7);
+  for(let i=0;i<20;i++){
+    const x=16+rng()*12;                 // BMI-like, but intercept at x=0 is on-screen
+    const y=8*x+50+(rng()-0.5)*28;
+    pts.push([x,y]);
+  }
+  return pts;
+}
+const diab=makeDiabetes();
+function drawLin(){
+  const th1=+linS.value, th0=+linI.value;
+  linSv.textContent=th1.toFixed(1); linIv.textContent=th0.toFixed(0);
+  const A=axes(linCanvas,[-1,32],[-60,340]);
+  scatter(A,diab,'#1c1917',4);
+  const xs=linspace(-1,32,80), ys=xs.map(x=>th1*x+th0);
+  line(A,xs,ys,'#0f4c5c',2.5);
+  A.ctx.save();
+  A.ctx.beginPath(); A.ctx.rect(A.p,A.p,A.W-2*A.p,A.H-2*A.p); A.ctx.clip();
+  A.ctx.strokeStyle='rgba(154,52,18,.45)';
+  for(const [x,y] of diab){
+    A.ctx.beginPath(); A.ctx.moveTo(A.x2(x),A.y2(y)); A.ctx.lineTo(A.x2(x),A.y2(th1*x+th0)); A.ctx.stroke();
+  }
+  A.ctx.restore();
+  mark(A,0,th0,'#9a3412',t('截距 (0, θ₀)'));
+  const yh=diab.map(([x])=>th1*x+th0), yy=diab.map(p=>p[1]);
+  linMSE.textContent=mse(yy,yh).toFixed(1);
+  linEq.textContent=`f(x) = ${th1.toFixed(2)} x + (${th0.toFixed(1)})`;
+}
+linS.oninput=linI.oninput=drawLin;
+linReset.onclick=()=>{linS.value=8; linI.value=50; drawLin()};
+linFit.onclick=()=>{
+  const X=diab.map(([x])=>[1,x]), y=diab.map(p=>p[1]), th=ols(X,y);
+  linI.value=th[0]; linS.value=th[1]; drawLin();
+};
+
+/* ---------- ch2 polynomial ---------- */
+let polySeed=0, polyTrain=[], polyHold=[];
+function trueFn(x){return Math.cos(1.5*Math.PI*x)}
+function samplePoly(){
+  const rng=mulberry(12+polySeed), n=24, noise=+polyNoise.value;
+  const tr=[], ho=[];
+  for(let i=0;i<n;i++){const x=rng(); tr.push([x, trueFn(x)+(rng()-0.5)*2*noise])}
+  for(let i=0;i<n;i++){const x=rng(); ho.push([x, trueFn(x)+(rng()-0.5)*2*noise])}
+  tr.sort((a,b)=>a[0]-b[0]); polyTrain=tr; polyHold=ho;
+}
+function drawPoly(){
+  const p=+polyDeg.value; polyDegV.textContent=p; polyNoiseV.textContent=(+polyNoise.value).toFixed(2);
+  const xs=polyTrain.map(d=>d[0]), ys=polyTrain.map(d=>d[1]);
+  const X=vandermonde(xs,p), th=ridge(X,ys,1e-6) || ridge(X,ys,1e-3) || ridge(X,ys,1e-1);
+  const grid=linspace(0,1,200);
+  const yh=mv(vandermonde(grid,p), th);
+  const A=axes(polyCanvas,[0,1],[-2,2]);
+  line(A,grid,grid.map(trueFn),'#9a3412',1.5);
+  line(A,grid,yh,'#0f4c5c',2.2);
+  scatter(A,polyTrain,'#2563eb',4);
+  scatter(A,polyHold,'#e11d48',3.5);
+  const trM=mse(ys, mv(X,th));
+  const hoM=mse(polyHold.map(d=>d[1]), mv(vandermonde(polyHold.map(d=>d[0]),p), th));
+  polyTr.textContent=trM.toFixed(3); polyHo.textContent=hoM.toFixed(3);
+  polyDiag.textContent = t(trM<0.05 && hoM>2*trM+0.08 ? '診斷：過擬合（訓練好、holdout 差）'
+    : (trM>0.15 && hoM>0.15) ? '診斷：欠擬合（兩邊都差）' : '診斷：相對健康的折衷');
+}
+polyDeg.oninput=drawPoly;
+polyNoise.oninput=()=>{samplePoly(); drawPoly(); drawRidge();};
+polyResample.onclick=()=>{polySeed++; samplePoly(); drawPoly(); drawRidge();};
+
+/* ---------- sigmoid ---------- */
+function drawSig(){
+  const a=+sigA.value, b=+sigB.value; sigAv.textContent=a.toFixed(1); sigBv.textContent=b.toFixed(1);
+  const xs=linspace(-8,8,200), ys=xs.map(x=>sigmoid(a*x+b));
+  const A=axes(sigCanvas,[-8,8],[-0.05,1.15]);
+  line(A,xs,ys,'#0f4c5c',2.5);
+  A.ctx.save();
+  A.ctx.setLineDash([4,4]);
+  line(A,[-8,8],[0.5,0.5],'#a8a29e',1);
+  A.ctx.restore();
+  mark(A,0,sigmoid(b),'#9a3412',t('(0, σ(θ₀))'));
+  const z0=a===0?null:-b/a;
+  if(z0!=null && z0<8 && z0>-8) mark(A,z0,0.5,'#0f766e','σ=0.5');
+}
+sigA.oninput=sigB.oninput=drawSig;
+
+/* ---------- classification compare ---------- */
+function makeBlobs(extra){
+  const rng=mulberry(3), P=[], N=[];
+  for(let i=0;i<40;i++){P.push([1.2+rng()*1.6, 2.6+rng()*1.4,1]); N.push([2.6+rng()*1.8, 1.1+rng()*1.3,0])}
+  if(extra) N.push([8.5,0.4,0]);
+  return P.concat(N);
+}
+function fitLogistic(pts,steps=800,lr=0.35){
+  let th=[0,0,0];
+  const n=pts.length;
+  for(let s=0;s<steps;s++){
+    let g=[0,0,0];
+    for(const [x,y,lab] of pts){
+      const z=th[0]+th[1]*x+th[2]*y, p=sigmoid(z), e=p-lab;
+      g[0]+=e; g[1]+=e*x; g[2]+=e*y;
+    }
+    th[0]-=lr*g[0]/n; th[1]-=lr*g[1]/n; th[2]-=lr*g[2]/n;
+  }
+  return th;
+}
+function drawCls(){
+  const pts=makeBlobs(clsOutlier.checked);
+  const X=pts.map(p=>[1,p[0],p[1]]), y=pts.map(p=>p[2]);
+  const thL=ols(X,y), thG=fitLogistic(pts);
+  function paint(cv, th, logistic){
+    const A=axes(cv,[0,9],[0,5]);
+    const step=0.05;
+    A.ctx.save();
+    A.ctx.beginPath(); A.ctx.rect(A.p,A.p,A.W-2*A.p,A.H-2*A.p); A.ctx.clip();
+    for(let x=0;x<9;x+=step) for(let yv=0;yv<5;yv+=step){
+      const z=th[0]+th[1]*x+th[2]*yv;
+      const p=logistic?sigmoid(z):z;
+      A.ctx.fillStyle=p>=0.5?'rgba(15,76,92,.20)':'rgba(154,52,18,.14)';
+      const px=A.x2(x), py=A.y2(yv+step);
+      A.ctx.fillRect(px, py, A.x2(x+step)-px+0.5, A.y2(yv)-py+0.5);
+    }
+    A.ctx.restore();
+    /* decision boundary: θ·[1,x,y] = 0 (logistic) or 0.5 (linear) */
+    const t=logistic?0:0.5;
+    if(Math.abs(th[2])>1e-8){
+      const xs=[0,9], ys=xs.map(x=>(t-th[0]-th[1]*x)/th[2]);
+      line(A,xs,ys,'#1c1917',1.6);
+    }
+    scatter(A, pts.filter(p=>p[2]===1).map(p=>[p[0],p[1]]), '#0f4c5c', 4);
+    scatter(A, pts.filter(p=>p[2]===0).map(p=>[p[0],p[1]]), '#9a3412', 4);
+  }
+  paint(clsLin, thL, false); paint(clsLog, thG, true);
+}
+clsOutlier.onchange=clsRedraw.onclick=drawCls;
+
+/* ---------- softmax bars ---------- */
+function drawSM(){
+  const z=[+sm1.value,+sm2.value,+sm3.value];
+  sm1v.textContent=z[0].toFixed(1); sm2v.textContent=z[1].toFixed(1); sm3v.textContent=z[2].toFixed(1);
+  const p=softmax(z), A=axes(smCanvas,[0,4],[0,1.15]);
+  const cols=['#0f4c5c','#0f766e','#9a3412'];
+  p.forEach((pi,i)=>{
+    const x0=i+0.55, x1=i+1.25;
+    A.ctx.fillStyle=cols[i];
+    const px=A.x2(x0), w=A.x2(x1)-px, py=A.y2(pi), h=A.y2(0)-py;
+    A.ctx.fillRect(px, py, w, h);
+    A.ctx.fillStyle='#1c1917'; A.ctx.font='12px IBM Plex Mono,monospace';
+    A.ctx.fillText('p='+pi.toFixed(3), px, py-6);
+  });
+  const s=p.reduce((a,b)=>a+b,0);
+  smStats.innerHTML=`<div class="stat">Σ p = ${s.toFixed(4)}${t('（應為 1）')}</div>
+    <div class="stat">argmax = class ${p.indexOf(Math.max(...p))+1}</div>`;
+}
+sm1.oninput=sm2.oninput=sm3.oninput=drawSM;
+
+/* ---------- ridge demo uses poly data ---------- */
+function drawRidge(){
+  const lam=Math.pow(10,+ridgeLam.value); ridgeLamV.textContent=lam.toExponential(2);
+  if(!polyTrain.length) samplePoly();
+  const p=14, xs=polyTrain.map(d=>d[0]), ys=polyTrain.map(d=>d[1]);
+  const X=vandermonde(xs,p), th=ridge(X,ys,lam) || ridge(X,ys, Math.max(lam,1e-4));
+  const grid=linspace(0,1,200), yh=mv(vandermonde(grid,p),th);
+  const A=axes(ridgeCanvas,[0,1],[-2,2]);
+  line(A,grid,grid.map(trueFn),'#9a3412',1.5);
+  line(A,grid,yh,'#0f4c5c',2.2);
+  scatter(A,polyTrain,'#2563eb',4);
+  scatter(A,polyHold,'#e11d48',3.5);
+  const nrm=Math.sqrt(th.slice(1).reduce((s,v)=>s+v*v,0));
+  ridgeNrm.textContent=nrm.toFixed(2);
+  ridgeTr.textContent=mse(ys,mv(X,th)).toFixed(3);
+  ridgeHo.textContent=mse(polyHold.map(d=>d[1]), mv(vandermonde(polyHold.map(d=>d[0]),p),th)).toFixed(3);
+}
+ridgeLam.oninput=drawRidge;
+
+/* ---------- coefficient paths ---------- */
+function synthReg(){
+  const rng=mulberry(21), n=80, d=6, X=[], y=[];
+  const w=[2.5,-1.8,0,0,1.4,0];
+  for(let i=0;i<n;i++){
+    const row=[1];
+    for(let j=0;j<d;j++) row.push(rng()*2-1);
+    X.push(row);
+    y.push(row.slice(1).reduce((s,v,j)=>s+v*w[j],0)+0.15*(rng()-0.5));
+  }
+  /* standardize non-intercept columns so L1/L2 share a scale */
+  for(let j=1;j<=d;j++){
+    const col=X.map(r=>r[j]), m=mean(col), s=std(col);
+    for(let i=0;i<n;i++) X[i][j]=(X[i][j]-m)/s;
+  }
+  return {X,y,w};
+}
+const regDat=synthReg();
+function softThresh(z,g){ if(z>g) return z-g; if(z<-g) return z+g; return 0}
+function lassoCD(X,y,lam,iters=80){
+  const n=X.length, d=X[0].length, th=Array(d).fill(0);
+  const colNorm=Array(d).fill(0);
+  for(let j=0;j<d;j++) for(let i=0;i<n;i++) colNorm[j]+=X[i][j]*X[i][j];
+  for(let t=0;t<iters;t++){
+    for(let j=0;j<d;j++){
+      let r=0; for(let i=0;i<n;i++){
+        let pred=0; for(let k=0;k<d;k++) if(k!==j) pred+=X[i][k]*th[k];
+        r+=X[i][j]*(y[i]-pred);
+      }
+      if(j===0) th[0]=r/(colNorm[0]||1); // intercept free
+      else th[j]=softThresh(r/n, lam) / ((colNorm[j]/n)||1e-8);
+    }
+  }
+  return th;
+}
+function drawPath(){
+  const lam=Math.pow(10,+pathLam.value); pathLamV.textContent=lam.toExponential(2);
+  const {X,y}=regDat;
+  const thR=ridge(X,y,lam);
+  const thL=lassoCD(X,y,lam);
+  function bars(cv,th){
+    const A=axes(cv,[0,7],[-3,3]);
+    th.forEach((v,i)=>{
+      A.ctx.fillStyle=i===0?'#a8a29e': (Math.abs(v)<1e-3?'#d6d3d1':'#0f4c5c');
+      const x0=i+0.35, x1=i+0.85;
+      const top=A.y2(Math.max(0,v)), bot=A.y2(Math.min(0,v));
+      A.ctx.fillRect(A.x2(x0), top, A.x2(x1)-A.x2(x0), Math.max(2, bot-top));
+    });
+  }
+  bars(pathRidge, thR); bars(pathLasso, thL);
+  const nz=thL.slice(1).filter(v=>Math.abs(v)>0.05).length;
+  pathStats.innerHTML=`<div class="stat">${t('Lasso 非零特徵（不含截距）')} ≈ ${nz}${t('（真值為 3）')}</div>
+    <div class="stat">Ridge ∥θ∥₂ = ${Math.sqrt(thR.slice(1).reduce((s,v)=>s+v*v,0)).toFixed(2)}</div>`;
+}
+pathLam.oninput=drawPath;
+
+/* ---------- glossary ---------- */
+const GLOSS=[
+['Accuracy','準確率 · 誤差儀表','測試集上預測對幾成。程式：model.score(X_test,y_test)。','#ch4-fail'],
+['Attribute / Feature','特徵 · 資料','輸入欄位，組成 x。程式：X 的欄。','#ch1-dataset'],
+['Class','類別 · 預測目標','分類要預測的離散答案。','#ch3-def'],
+['Coefficient / θ','係數 · 參數','fit 算出來的旋鈕。程式：coef_、intercept_。','#ch1-fit'],
+['Cross-entropy','交叉熵 · 誤差','分類訓練時最小化的損失。對外報告改看測試準確率。','#ch3-loss'],
+['Decision boundary','決策邊界 · 預測','機率=0.5（或 z=0）的界線。','#ch3-sig'],
+['Development / Validation set','驗證集','用來選 p、λ。不可拿來報最終成績。','#ch4-split'],
+['Feature map φ','特徵映射 · 資料','PolynomialFeatures 把 x 變成 (1,x,…,x^p)。','#ch2-phi'],
+['Holdout / Test set','留出／測試集','沒參加 fit 的點。測試誤差才算數。','#ch4-fail'],
+['Hyperparameter','超參數','p、λ、C。驗證集選，不是 fit 直接學。','#ch2-choose'],
+['Lasso','L1 正則化','把沒用的參數變成 0。程式：Lasso.fit 後看 coef_。','#ch4-lasso'],
+['LinearRegression.fit','擬合 · 算參數','內部解 OLS，寫入 coef_/intercept_。','#ch1-fit'],
+['Logistic regression','邏輯迴歸 · 分類器','predict 給類別，predict_proba 給機率。','#ch3-sig'],
+['MSE','均方誤差 · 誤差儀表','mean_squared_error(y, y_hat)。看測試集。','#ch1-err'],
+['Overfitting','過擬合','訓練誤差低、測試誤差高。降低 p 或加大 λ。','#ch4-fail'],
+['Pipeline','管線','先 PolynomialFeatures（資料）再 LinearRegression（參數）。','#ch2-phi'],
+['predict / predict_proba','預測值／機率','不再 fit。線性：分數；邏輯：類別或機率。','#ch1-pred'],
+['Regularization λ','正則化強度 · 超參數','sklearn 的 alpha。驗證集選。','#ch4-ridge'],
+['Ridge','L2 正則化','壓小參數、曲線變平滑。Ridge(alpha=λ).fit。','#ch4-ridge'],
+['Sigmoid σ','S 形函數 · 機率','把分數擠到 (0,1)。predict_proba[:,1]。','#ch3-sig'],
+['Softmax','多類機率','各類分數指數後歸一。兩類時=sigmoid。','#ch3-soft'],
+['Sparsity','稀疏性','多數係數為 0。Lasso 用來選特徵。','#ch4-lasso'],
+['Supervised learning','監督式學習','用有標籤資料學 x→y。','#ch1-three'],
+['Target y','目標 · 資料','要預測的答案。連續=迴歸，離散=分類。','#ch1-dataset'],
+['Training set','訓練集 · 資料','只在這裡 fit 參數。','#ch4-split'],
+['Underfitting','欠擬合','訓練與測試誤差都高。模型太弱。','#ch4-fail'],
+['import / from … import','借工具箱 · Python','沒借就不能用那個名字。','#py-import'],
+['變數 = 值','指定 · Python','把右邊存進左邊的名字。判斷相等是 ==。','#py-sent'],
+['obj.方法()','方法 · Python','點號=用這台機器的功能。fit/predict 都是方法。','#py-dot'],
+['obj.屬性','屬性 · Python','沒有括號。coef_ 是 fit 之後才有的參數。','#py-dot'],
+['清單 [ ] 與切片','資料結構 · Python','編號從 0 起。[-20:] 是最後 20 個。','#py-list'],
+['for x in 清單:','迴圈 · Python','對每個值做縮排裡的那些行。用來掃 p 或 λ。','#py-cheat'],
+['NumPy @ 與 .T','矩陣 · Python','@ 是矩陣乘，.T 是轉置。* 不是矩陣乘。','#py-np'],
+['pandas loc / iloc','表格 · Python','loc 用名稱，iloc 用位置。列=樣本，欄=特徵。','#py-pd'],
+['關鍵字引數 a=True','呼叫 · Python','用名字傳設定，如 return_X_y=True。','#py-dot']
+];
+const gEl=document.getElementById('glossary');
+GLOSS.forEach(([en,zh,def,href])=>{
+  const d=document.createElement('div'); d.className='idx-item';
+  d.innerHTML=`<b><a href="${href}">${en}</a></b>　${zh}<br/><span class="note">${def}</span>`;
+  gEl.appendChild(d);
+});
+
+/* ---------- quiz helper ---------- */
+function grade(btn,ok,id){
+  const el=document.getElementById(id);
+  el.innerHTML=ok?t('<span class="ok">正確。</span> 這正是教材要你記住的一點。'):t('<span class="bad">再想一次。</span> 回到對應章節對照定義。');
+  [...btn.parentElement.querySelectorAll('button')].forEach(b=>b.disabled=true);
+}
+
+/* ---------- toc filter & active ---------- */
+tocFilter.addEventListener('input',()=>{
+  const q=tocFilter.value.trim().toLowerCase();
+  document.querySelectorAll('nav.toc a').forEach(a=>{
+    a.style.display=!q || a.textContent.toLowerCase().includes(q)?'block':'none';
+  });
+});
+const links=[...document.querySelectorAll('nav.toc a')];
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){ links.forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+e.target.id)) }});
+},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('h2[id],h3[id],.demo[id],section[id]').forEach(s=>io.observe(s));
+document.getElementById('menuBtn')?.addEventListener('click',()=>toc.classList.toggle('open'));
+toc.addEventListener('click',e=>{ if(e.target.tagName==='A') toc.classList.remove('open')});
+
+/* ---------- boot ---------- */
+const _zoom=new URLSearchParams(location.search).get('zoom');
+if (_zoom) document.documentElement.style.zoom=_zoom;
+samplePoly();
+drawLin(); drawPoly(); drawSig(); drawCls(); drawSM(); drawRidge(); drawPath();
+initOpenCC();
+if (location.hash) {
+  const el=document.querySelector(location.hash);
+  if (el) setTimeout(()=>el.scrollIntoView(), 50);
+}
+document.getElementById('btnHant').addEventListener('click',()=>setLang('zh-Hant'));
+document.getElementById('btnHans').addEventListener('click',()=>setLang('zh-Hans'));
+function renderKatex(){
+  if(window.renderMathInElement){
+    renderMathInElement(document.body,{
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'\\(',right:'\\)',display:false}],
+      throwOnError:false,
+      ignoredClasses:['lang-switch']
+    });
+  }
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  initOpenCC();
+  renderKatex();
+});
+window.addEventListener('load',()=>{
+  initOpenCC();
+  renderKatex();
+  setLang(pageLang);
+});
+</script>
+</body>
+</html>
